@@ -4,396 +4,346 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FreshMart 簡易下單系統 — 流程說明</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* 主色：#FF2D2D，以漸層 + 半透明呈現，避免死紅 */
-    --brand: #ff2d2d;
-    --brand-deep: #e01010;          /* 漸層深色端，確保白字對比 */
-    --brand-grad: linear-gradient(135deg, #ff3b3b 0%, #e01010 100%);
-    --brand-ink: #c81818;           /* 紅色小字（對比達 AA） */
-    --brand-08: rgba(255, 45, 45, .08);
-    --brand-12: rgba(255, 45, 45, .12);
-    --brand-18: rgba(255, 45, 45, .18);
-    --brand-glow: rgba(255, 45, 45, .35);
+    /* 主色 / CTA / 背景 */
+    --red: #ff2d2d;
+    --red-deep: #e11414;
+    --red-ink: #c81818;
+    --orange: #f97316;
+    --orange-deep: #ea580c;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --ink: #0f172a;
+    --ink-2: #334155;
+    --muted: #64748b;
+    --line: #e8eef6;
 
-    --bg: #faf9fb;
-    --ink: #1b1d23;
-    --ink-2: #41454f;
-    --muted: #767b86;
-    --line: rgba(20, 18, 24, .08);
+    /* 活潑區塊配色（clay tints） */
+    --c-red-bg:#ffe7e4;   --c-red:#e11414;
+    --c-orange-bg:#ffeacd;--c-orange:#d9560a;
+    --c-blue-bg:#e2ecff;  --c-blue:#2456d6;
+    --c-violet-bg:#ece6ff;--c-violet:#7338e0;
+    --c-green-bg:#d8f9e4; --c-green:#0f9d52;
+    --c-amber-bg:#fef0c8; --c-amber:#c47d09;
+    --c-teal-bg:#ccf6fb;  --c-teal:#0a8aa3;
 
-    /* 玻璃面 */
-    --glass: rgba(255, 255, 255, .62);
-    --glass-strong: rgba(255, 255, 255, .82);
-    --glass-line: rgba(255, 255, 255, .75);
+    /* 黏土陰影 */
+    --clay: 0 14px 30px rgba(15,23,42,.08), 0 3px 8px rgba(15,23,42,.05);
+    --clay-hi: 0 24px 48px rgba(15,23,42,.14), 0 6px 14px rgba(15,23,42,.07);
+    --blob-clay: inset 0 3px 6px rgba(255,255,255,.75), inset 0 -6px 9px rgba(0,0,0,.10), 0 8px 16px rgba(15,23,42,.12);
 
-    /* 角色色 */
-    --user: #1c6ed6;  --user-bg: rgba(28,110,214,.10);
-    --sys:  #6d49d6;  --sys-bg:  rgba(109,73,214,.10);
-    --admin:#e8590c;  --admin-bg:rgba(232,89,12,.10);
-
-    /* 狀態色 */
-    --ok: #18a558;   --ok-bg: rgba(24,165,88,.12);
-    --wait: #e8730c; --wait-bg: rgba(232,115,12,.12);
-    --info: #0c92a8; --info-bg: rgba(12,146,168,.12);
-
-    --r-sm: 14px; --r: 20px; --r-lg: 28px;
-    --sh-sm: 0 4px 14px rgba(30,18,22,.06);
-    --sh: 0 14px 40px rgba(40,18,22,.10);
-    --sh-glow: 0 16px 40px rgba(255,45,45,.28);
+    --r: 22px; --r-lg: 30px; --r-xl: 38px;
+    --ease: cubic-bezier(.34,1.4,.5,1);
   }
 
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    font-family: "Segoe UI", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+    font-family: "Nunito", "Microsoft JhengHei", system-ui, sans-serif;
     background: var(--bg);
     color: var(--ink);
-    line-height: 1.65;
+    line-height: 1.7;
+    font-weight: 600;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
-  /* 背景科技感光暈 */
-  body::before {
-    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-    background:
-      radial-gradient(620px circle at 10% 4%, rgba(255,45,45,.13), transparent 45%),
-      radial-gradient(520px circle at 92% 16%, rgba(255,110,90,.12), transparent 46%),
-      radial-gradient(760px circle at 50% 108%, rgba(255,45,45,.07), transparent 52%);
-  }
-  ::selection { background: var(--brand-18); }
+  h1, h2, h3, h4, .font-display { font-family: "Fredoka", "Microsoft JhengHei", sans-serif; font-weight: 600; }
+  ::selection { background: #ffd7d2; }
 
-  .icon { width: 1em; height: 1em; display: inline-block; vertical-align: -.125em; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+  .icon { width: 1em; height: 1em; display: inline-block; vertical-align: -.135em; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
   .icon.fill { fill: currentColor; stroke: none; }
 
-  /* ───── Hero ───── */
-  header {
-    position: relative; overflow: hidden; text-align: center;
-    padding: 64px 24px 64px;
-    background:
-      radial-gradient(900px circle at 50% -10%, rgba(255,45,45,.20), transparent 55%),
-      linear-gradient(180deg, #fff6f6 0%, var(--bg) 100%);
-  }
-  header .chip {
-    display: inline-flex; align-items: center; gap: 7px; margin-bottom: 18px;
-    background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--brand-18); color: var(--brand-ink);
-    padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; box-shadow: var(--sh-sm);
-  }
-  header .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px var(--brand-18); }
-  header h1 {
-    margin: 0 0 14px; font-size: clamp(28px, 5vw, 42px); letter-spacing: -1px; line-height: 1.15;
-  }
-  header h1 .accent {
-    background: var(--brand-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  header p { margin: 0 auto; max-width: 640px; font-size: clamp(15px, 2.2vw, 17px); color: var(--ink-2); }
-  header .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 26px; }
-  header .htag {
-    background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-line); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--ink-2);
-    display: inline-flex; align-items: center; gap: 7px; box-shadow: var(--sh-sm);
-  }
-  header .htag .icon { color: var(--brand); font-size: 16px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 8px 22px 80px; }
+  /* 黏土圖示方塊 */
+  .blob { border-radius: 18px; display: grid; place-items: center; box-shadow: var(--blob-clay); flex: none; }
+  .blob.red    { background: var(--c-red-bg);    color: var(--c-red); }
+  .blob.orange { background: var(--c-orange-bg); color: var(--c-orange); }
+  .blob.blue   { background: var(--c-blue-bg);   color: var(--c-blue); }
+  .blob.violet { background: var(--c-violet-bg); color: var(--c-violet); }
+  .blob.green  { background: var(--c-green-bg);  color: var(--c-green); }
+  .blob.amber  { background: var(--c-amber-bg);  color: var(--c-amber); }
+  .blob.teal   { background: var(--c-teal-bg);   color: var(--c-teal); }
+
+  /* 黏土卡片 */
+  .card { background: var(--card); border-radius: var(--r-lg); box-shadow: var(--clay); transition: transform .28s var(--ease), box-shadow .28s var(--ease); }
+  .card.hoverable:hover { transform: translateY(-7px); box-shadow: var(--clay-hi); }
+
+  /* 黏土按鈕（CTA 橘） */
+  .btn {
+    font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 16px; color: #fff;
+    background: linear-gradient(180deg, #fb8c3c 0%, #d9480a 100%);
+    border: none; border-radius: 16px; padding: 13px 22px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 9px 18px rgba(217,72,10,.34), inset 0 2px 3px rgba(255,255,255,.45), inset 0 -5px 9px rgba(140,45,5,.4);
+    transition: transform .18s var(--ease), box-shadow .18s var(--ease);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 15px 26px rgba(217,72,10,.42), inset 0 2px 3px rgba(255,255,255,.45), inset 0 -5px 9px rgba(140,45,5,.4); }
+  .btn:active { transform: translateY(1px); box-shadow: 0 4px 9px rgba(217,72,10,.3), inset 0 3px 7px rgba(140,45,5,.5); }
+  .btn:focus-visible { outline: 3px solid #fdba74; outline-offset: 2px; }
+  .btn.ghost { background: #fff; color: var(--orange-deep); box-shadow: var(--clay); }
+  .btn.ghost:hover { box-shadow: var(--clay-hi); }
+  .btn.red { background: linear-gradient(180deg, #ff5a4d 0%, #d11414 100%); box-shadow: 0 9px 18px rgba(209,20,20,.32), inset 0 2px 3px rgba(255,255,255,.4), inset 0 -5px 9px rgba(150,8,8,.4); }
+
+  /* ───── Hero（左對齊區塊） ───── */
+  header { padding: 48px 0 24px; position: relative; }
+  .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; align-items: center; }
+  .pill-badge {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--c-red-bg); color: var(--red-ink);
+    padding: 8px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 800; box-shadow: var(--clay);
+  }
+  .pill-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+  .hero h1 { margin: 18px 0 16px; font-size: clamp(34px, 6vw, 56px); line-height: 1.05; letter-spacing: -.5px; }
+  .hero h1 .accent { color: var(--red); }
+  .hero p { margin: 0; font-size: clamp(15px, 2.2vw, 18px); color: var(--ink-2); max-width: 480px; font-weight: 600; }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .hero-tags .htag { display: inline-flex; align-items: center; gap: 8px; background: #fff; padding: 9px 16px; border-radius: 14px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); box-shadow: var(--clay); transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+  .hero-tags .htag:hover { transform: translateY(-3px); box-shadow: var(--clay-hi); }
+  .hero-tags .htag .icon { font-size: 17px; }
+
+  /* Hero 黏土磁磚群 */
+  .hero-art { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; transform: rotate(-3deg); }
+  .tile { border-radius: 24px; padding: 20px 18px; box-shadow: var(--blob-clay); }
+  .tile .ti { width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,.55); display: grid; place-items: center; font-size: 22px; box-shadow: inset 0 2px 4px rgba(255,255,255,.7); }
+  .tile .tn { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 16px; margin-top: 12px; }
+  .tile .ts { font-size: 11.5px; opacity: .75; font-weight: 700; }
+  .tile.t1 { background: var(--c-red-bg); color: var(--c-red); transform: rotate(4deg); }
+  .tile.t2 { background: var(--c-orange-bg); color: var(--c-orange); transform: rotate(-3deg); margin-top: 18px; }
+  .tile.t3 { background: var(--c-green-bg); color: var(--c-green); transform: rotate(-4deg); margin-top: -6px; }
+  .tile.t4 { background: var(--c-blue-bg); color: var(--c-blue); transform: rotate(3deg); }
 
   /* ───── Section heading ───── */
-  h2 { font-size: clamp(20px, 3.4vw, 26px); margin: 64px 0 6px; display: flex; align-items: center; gap: 12px; letter-spacing: -.5px; }
-  h2 .num {
-    display: inline-grid; place-items: center; width: 38px; height: 38px; flex: none;
-    background: var(--brand-grad); color: #fff; border-radius: 13px; font-size: 16px; font-weight: 800;
-    box-shadow: var(--sh-glow);
-  }
-  .sub { color: var(--muted); font-size: 14.5px; margin: 0 0 24px; padding-left: 50px; }
+  section { padding-top: 18px; }
+  .shead { display: flex; align-items: center; gap: 14px; margin: 64px 0 6px; }
+  .shead .num { width: 46px; height: 46px; font-size: 20px; color: #fff; background: linear-gradient(180deg,#ff5a4d,#d11414); box-shadow: 0 8px 16px rgba(209,20,20,.3), inset 0 2px 3px rgba(255,255,255,.4), inset 0 -5px 8px rgba(150,8,8,.35); border-radius: 16px; display: grid; place-items: center; font-family: "Fredoka",sans-serif; }
+  .shead h2 { margin: 0; font-size: clamp(22px, 3.6vw, 30px); letter-spacing: -.3px; }
+  .sub { color: var(--muted); font-size: 15px; margin: 0 0 26px; padding-left: 60px; font-weight: 600; }
 
-  /* ───── glass card base ───── */
-  .glass {
-    background: var(--glass); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4);
-    border: 1px solid var(--glass-line); border-radius: var(--r); box-shadow: var(--sh);
-  }
-
-  /* ───── 一眼看懂 ───── */
-  .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .ov {
-    position: relative; text-align: center; padding: 26px 18px 22px;
-    background: var(--glass); backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3);
-    border: 1px solid var(--glass-line); border-radius: var(--r); box-shadow: var(--sh-sm);
-    transition: transform .25s ease, box-shadow .25s ease;
-  }
-  .ov:hover { transform: translateY(-5px); box-shadow: var(--sh); }
-  .ov .ring {
-    width: 56px; height: 56px; border-radius: 18px; margin: 0 auto 14px; display: grid; place-items: center;
-    background: var(--brand-08); color: var(--brand); border: 1px solid var(--brand-18); font-size: 26px;
-  }
-  .ov .h { font-weight: 800; font-size: 16px; margin-bottom: 5px; }
-  .ov .t { font-size: 13px; color: var(--muted); }
-  .ov .step-no { position: absolute; top: 14px; right: 16px; font-size: 12px; font-weight: 800; color: var(--brand-18); }
-  .ov:not(:last-child) .arr {
-    position: absolute; right: -16px; top: 46px; z-index: 3; width: 32px; height: 32px; border-radius: 50%;
-    background: var(--brand-grad); color: #fff; display: grid; place-items: center; box-shadow: 0 6px 14px var(--brand-glow);
-  }
+  /* ───── 一眼看懂（區塊） ───── */
+  .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .ov { padding: 24px 20px; position: relative; }
+  .ov .blob { width: 50px; height: 50px; font-size: 24px; margin-bottom: 16px; }
+  .ov .h { font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 18px; margin-bottom: 4px; }
+  .ov .t { font-size: 13.5px; color: var(--muted); font-weight: 600; line-height: 1.55; }
+  .ov .no { position: absolute; top: 20px; right: 22px; font-family: "Fredoka",sans-serif; font-size: 22px; color: var(--line); font-weight: 700; }
 
   /* ───── 角色圖例 ───── */
-  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 0; }
-  .legend .tag { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px; border-radius: 999px; font-weight: 700; border: 1px solid transparent; }
-  .legend .tag .icon { font-size: 15px; }
-  .t-user { background: var(--user-bg); color: var(--user); border-color: rgba(28,110,214,.18); }
-  .t-sys  { background: var(--sys-bg);  color: var(--sys);  border-color: rgba(109,73,214,.18); }
-  .t-admin{ background: var(--admin-bg); color: var(--admin); border-color: rgba(232,89,12,.18); }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .legend .tag { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; padding: 9px 18px; border-radius: 14px; font-weight: 800; box-shadow: var(--clay); }
+  .legend .tag .icon { font-size: 16px; }
+  .t-user { background: var(--c-blue-bg); color: var(--c-blue); }
+  .t-sys  { background: var(--c-violet-bg); color: var(--c-violet); }
+  .t-admin{ background: var(--c-orange-bg); color: var(--c-orange); }
 
   /* ───── 流程步驟 ───── */
-  .flow { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
-  .step {
-    position: relative; padding: 18px 22px; display: flex; gap: 18px; align-items: flex-start;
-    background: var(--glass); backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3);
-    border: 1px solid var(--glass-line); border-radius: var(--r); box-shadow: var(--sh-sm);
-    transition: transform .22s ease, box-shadow .22s ease;
-    overflow: hidden;
-  }
-  .step::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; border-radius: 5px; }
-  .step.user::before { background: var(--user); }
-  .step.sys::before  { background: var(--sys); }
-  .step.admin::before{ background: var(--admin); }
-  .step:hover { transform: translateY(-3px); box-shadow: var(--sh); }
-  .step .badge-ico {
-    flex: none; width: 46px; height: 46px; border-radius: 15px; display: grid; place-items: center; font-size: 21px; color: #fff;
-  }
-  .step.user .badge-ico { background: linear-gradient(135deg,#3a8ae8,#1c6ed6); }
-  .step.sys  .badge-ico { background: linear-gradient(135deg,#8a66ed,#6d49d6); }
-  .step.admin .badge-ico{ background: linear-gradient(135deg,#f5803e,#e8590c); }
+  .flow { display: flex; flex-direction: column; gap: 16px; }
+  .step { padding: 22px 26px; display: flex; gap: 20px; align-items: flex-start; }
+  .step .blob { width: 52px; height: 52px; font-size: 24px; }
   .step .body { flex: 1; min-width: 0; }
-  .step .rolerow { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
-  .step .role { font-size: 11px; font-weight: 800; letter-spacing: .8px; padding: 2px 9px; border-radius: 999px; }
-  .step.user .role { background: var(--user-bg); color: var(--user); }
-  .step.sys  .role { background: var(--sys-bg);  color: var(--sys); }
-  .step.admin .role{ background: var(--admin-bg); color: var(--admin); }
-  .step .nidx { font-size: 12px; font-weight: 800; color: var(--muted); }
-  .step .title { font-weight: 800; font-size: 16.5px; margin: 0 0 4px; }
-  .step .desc { color: var(--ink-2); font-size: 14px; }
+  .step .rolerow { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
+  .step .role { font-size: 11.5px; font-weight: 800; letter-spacing: .6px; padding: 3px 12px; border-radius: 999px; }
+  .step.user .role { background: var(--c-blue-bg); color: var(--c-blue); }
+  .step.sys  .role { background: var(--c-violet-bg); color: var(--c-violet); }
+  .step.admin .role{ background: var(--c-orange-bg); color: var(--c-orange); }
+  .step .nidx { font-family: "Fredoka",sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .step .title { font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 19px; margin: 0 0 5px; }
+  .step .desc { color: var(--ink-2); font-size: 14.5px; font-weight: 600; }
 
-  /* ───── 狀態徽章 ───── */
-  .status { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 999px; margin-top: 11px; }
-  .status .icon { font-size: 13px; }
-  .s-wait { background: var(--wait-bg); color: var(--wait); }
-  .s-reported { background: var(--sys-bg); color: var(--sys); }
-  .s-confirmed { background: var(--ok-bg); color: var(--ok); }
-  .s-shipped { background: var(--info-bg); color: var(--info); }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; padding: 6px 14px; border-radius: 999px; margin-top: 13px; box-shadow: inset 0 2px 4px rgba(255,255,255,.6); }
+  .status .icon { font-size: 14px; }
+  .s-wait { background: var(--c-amber-bg); color: var(--c-amber); }
+  .s-reported { background: var(--c-violet-bg); color: var(--c-violet); }
+  .s-confirmed { background: var(--c-green-bg); color: var(--c-green); }
+  .s-shipped { background: var(--c-teal-bg); color: var(--c-teal); }
 
   /* ───── 畫面示意：手機 ───── */
-  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 30px; margin-top: 10px; }
-  .shot { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(244px, 1fr)); gap: 32px; }
+  .shot { display: flex; flex-direction: column; align-items: center; gap: 16px; }
   .shot .cap { text-align: center; }
-  .shot .cap b { font-size: 13.5px; font-weight: 800; }
-  .shot .cap span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .shot .cap b { font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 15px; }
+  .shot .cap span { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; font-weight: 600; }
 
   .phone {
-    width: 100%; max-width: 256px; border-radius: 34px; overflow: hidden; position: relative;
-    background: #fff; border: 1px solid var(--glass-line);
-    box-shadow: 0 26px 60px rgba(40,18,22,.20), 0 0 0 7px #1c1e25, 0 0 0 8px rgba(255,255,255,.08);
+    width: 100%; max-width: 262px; border-radius: 40px; overflow: hidden; position: relative; background: #fff;
+    box-shadow: 0 30px 60px rgba(15,23,42,.18), 0 0 0 8px #fff, 0 0 0 10px #ffe1dd;
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
   }
-  .phone .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 78px; height: 20px; background: #1c1e25; border-radius: 999px; z-index: 5; }
-  .pbar {
-    position: relative; padding: 26px 16px 14px; color: #fff;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0) 58%),
-      linear-gradient(135deg, rgba(255,59,59,.92) 0%, rgba(224,16,16,.92) 100%);
-    box-shadow: inset 0 -1px 0 rgba(255,255,255,.18);
-  }
-  .pbar::after {
-    content: ""; position: absolute; right: -30px; top: -40px; width: 120px; height: 120px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,.28), transparent 70%); pointer-events: none;
-  }
-  .pbar .ptitle { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; }
-  .pbar .ptitle .back { font-size: 18px; opacity: .9; }
-  .pbar .ptitle .icon { font-size: 17px; }
-  .psearch { position: relative; z-index: 1; margin-top: 12px; background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 7px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,.92); }
-  .pbody { padding: 14px; font-size: 12px; background: #fbfbfc; }
+  .phone:hover { transform: translateY(-8px); box-shadow: 0 42px 80px rgba(15,23,42,.24), 0 0 0 8px #fff, 0 0 0 10px #ffd0c9; }
+  .phone .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 82px; height: 22px; background: #1c1e25; border-radius: 999px; z-index: 5; }
+  .pbar { position: relative; padding: 28px 18px 16px; color: #fff; background: linear-gradient(165deg, #ff5a4d 0%, #d11414 100%); }
+  .pbar::after { content: ""; position: absolute; right: -28px; top: -36px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.3), transparent 70%); pointer-events: none; }
+  .pbar .ptitle { position: relative; z-index: 1; display: flex; align-items: center; gap: 9px; font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 15px; }
+  .pbar .ptitle .back { font-size: 19px; }
+  .pbar .ptitle .icon { font-size: 18px; }
+  .psearch { position: relative; z-index: 1; margin-top: 13px; background: rgba(255,255,255,.25); border-radius: 14px; padding: 9px 13px; display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: rgba(255,255,255,.95); box-shadow: inset 0 2px 5px rgba(120,0,0,.18); }
+  .pbody { padding: 16px; font-size: 12.5px; background: var(--bg); }
 
-  /* 分類膠囊 */
-  .chips { display: flex; gap: 7px; overflow: hidden; margin-bottom: 12px; }
-  .chips .c { font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
-  .chips .c.on { background: var(--brand-08); border-color: var(--brand-18); color: var(--brand-ink); }
+  .chips { display: flex; gap: 8px; overflow: hidden; margin-bottom: 14px; }
+  .chips .c { font-size: 11.5px; font-weight: 800; padding: 6px 13px; border-radius: 999px; background: #fff; color: var(--muted); white-space: nowrap; box-shadow: var(--clay); }
+  .chips .c.on { background: var(--c-red-bg); color: var(--c-red); }
 
-  /* 商品格 */
-  .pgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .pcard { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--sh-sm); }
-  .pcard .pimg { height: 64px; display: grid; place-items: center; font-size: 30px; }
-  .pcard .pimg.g1 { background: linear-gradient(135deg,#e7f9ec,#c9f0d6); }
-  .pcard .pimg.g3 { background: linear-gradient(135deg,#fde8ec,#ffd5dd); }
-  .pcard .pmeta { padding: 8px 9px 10px; }
-  .pcard .pn { font-weight: 700; font-size: 11.5px; }
-  .pcard .rate { display: flex; align-items: center; gap: 3px; color: #f5a623; font-size: 10px; margin: 3px 0 5px; }
+  .pgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pcard { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: var(--clay); }
+  .pcard .pimg { height: 70px; display: grid; place-items: center; }
+  .pcard .pimg .icon { font-size: 32px; }
+  .pcard .pimg.g1 { background: var(--c-green-bg); color: var(--c-green); }
+  .pcard .pimg.g3 { background: var(--c-red-bg); color: var(--c-red); }
+  .pcard .pmeta { padding: 10px 11px 12px; }
+  .pcard .pn { font-weight: 800; font-size: 12px; }
+  .pcard .rate { display: flex; align-items: center; gap: 3px; color: #f5a623; font-size: 10.5px; margin: 4px 0 6px; font-weight: 800; }
   .pcard .rate span { color: var(--muted); }
   .pcard .prow { display: flex; align-items: center; justify-content: space-between; }
-  .pcard .pp { color: var(--brand-ink); font-weight: 800; font-size: 13px; }
-  .pcard .add { width: 24px; height: 24px; border-radius: 9px; background: var(--brand-grad); color: #fff; display: grid; place-items: center; box-shadow: 0 4px 10px var(--brand-glow); }
-  .pcard .add .icon { font-size: 14px; }
+  .pcard .pp { font-family: "Fredoka",sans-serif; color: var(--red-ink); font-weight: 700; font-size: 14px; }
+  .pcard .add { width: 28px; height: 28px; border-radius: 10px; background: linear-gradient(180deg,#fb8c3c,#d9480a); color: #fff; display: grid; place-items: center; box-shadow: 0 5px 11px rgba(217,72,10,.4); }
+  .pcard .add .icon { font-size: 15px; }
 
-  /* 浮動購物車 */
-  .fab-cart {
-    margin-top: 12px; background: var(--brand-grad); color: #fff; border-radius: 999px; padding: 11px 16px;
-    display: flex; align-items: center; justify-content: space-between; box-shadow: var(--sh-glow); font-weight: 800; font-size: 12.5px;
-  }
-  .fab-cart .l { display: flex; align-items: center; gap: 8px; }
-  .fab-cart .l .icon { font-size: 16px; }
-  .fab-cart .pricetag { font-size: 13px; }
+  .fab-cart { margin-top: 14px; background: linear-gradient(180deg,#ff5a4d,#d11414); color: #fff; border-radius: 16px; padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 9px 18px rgba(209,20,20,.32); font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 13px; }
+  .fab-cart .l { display: flex; align-items: center; gap: 9px; } .fab-cart .l .icon { font-size: 17px; }
 
-  /* 表單欄位 */
-  .ifield { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 9px 12px; margin-bottom: 9px; }
-  .ifield .lbl { font-size: 10px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 4px; }
-  .ifield .req { color: var(--brand); }
-  .ifield .val { font-size: 12.5px; color: var(--ink); font-weight: 700; margin-top: 1px; }
-  .ifield .val.mono { font-family: ui-monospace, Consolas, monospace; letter-spacing: 2px; font-size: 15px; color: var(--brand-ink); }
-  .ifield .ph { font-size: 12px; color: #b9bdc6; margin-top: 1px; }
-  .ifield.focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-12); }
+  .ifield { background: #fff; border-radius: 15px; padding: 10px 14px; margin-bottom: 10px; box-shadow: inset 0 2px 5px rgba(15,23,42,.06); }
+  .ifield .lbl { font-size: 10.5px; color: var(--muted); font-weight: 800; display: flex; align-items: center; gap: 4px; }
+  .ifield .req { color: var(--red); }
+  .ifield .val { font-size: 13px; color: var(--ink); font-weight: 800; margin-top: 2px; }
+  .ifield .val.mono { font-family: "Fredoka",sans-serif; letter-spacing: 3px; font-size: 17px; color: var(--red-ink); }
+  .ifield .ph { font-size: 12.5px; color: #aab4c2; margin-top: 2px; font-weight: 700; }
+  .ifield.focus { box-shadow: 0 0 0 3px #ffd0c9, inset 0 2px 5px rgba(15,23,42,.06); }
 
-  .cta { background: var(--brand-grad); color: #fff; text-align: center; padding: 13px; border-radius: 999px; font-weight: 800; font-size: 13px; box-shadow: var(--sh-glow); margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 7px; }
-  .cta.ghost { background: #fff; color: var(--brand-ink); border: 1.5px solid var(--brand-18); box-shadow: none; margin-top: 9px; }
-  .cta .icon { font-size: 15px; }
+  .mbtn { background: linear-gradient(180deg,#fb8c3c,#d9480a); color: #fff; text-align: center; padding: 13px; border-radius: 15px; font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 13.5px; box-shadow: 0 8px 16px rgba(217,72,10,.36), inset 0 2px 3px rgba(255,255,255,.4), inset 0 -4px 8px rgba(140,45,5,.35); margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .mbtn.ghost { background: #fff; color: var(--orange-deep); box-shadow: var(--clay); margin-top: 10px; }
+  .mbtn .icon { font-size: 16px; }
 
-  /* 摘要卡 */
-  .sumcard { background: linear-gradient(135deg,#fff,#fff6f6); border: 1px solid var(--brand-12); border-radius: 16px; padding: 12px 14px; margin: 4px 0 12px; }
-  .sumcard .srow { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; }
+  .sumcard { background: var(--bg); border-radius: 18px; padding: 14px 16px; margin: 6px 0 14px; box-shadow: inset 0 2px 6px rgba(15,23,42,.05); }
+  .sumcard .srow { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; font-weight: 700; }
   .sumcard .srow .k { color: var(--muted); }
-  .sumcard .srow .v { font-weight: 700; }
-  .sumcard .srow .v.code { font-family: ui-monospace, Consolas, monospace; color: var(--brand-ink); letter-spacing: 1px; }
-  .sumcard .srow.total { border-top: 1px dashed var(--brand-18); margin-top: 6px; padding-top: 8px; }
-  .sumcard .srow.total .v { color: var(--brand-ink); font-size: 15px; font-weight: 800; }
+  .sumcard .srow .v.code { font-family: "Fredoka",sans-serif; color: var(--red-ink); letter-spacing: 1px; }
+  .sumcard .srow.total { border-top: 2px dashed #ffcdc6; margin-top: 8px; padding-top: 9px; }
+  .sumcard .srow.total .v { font-family: "Fredoka",sans-serif; color: var(--red-ink); font-size: 16px; }
 
-  /* 成功 */
-  .succ { text-align: center; padding: 8px 0 4px; }
-  .succ .ck {
-    width: 62px; height: 62px; border-radius: 50%; margin: 0 auto 10px; display: grid; place-items: center;
-    background: var(--brand-grad); color: #fff; box-shadow: 0 0 0 8px var(--brand-08), var(--sh-glow);
-  }
-  .succ .ck .icon { font-size: 30px; }
-  .succ .st { font-weight: 800; font-size: 14px; }
-  .succ .ss { font-size: 11.5px; color: var(--muted); }
+  .succ { text-align: center; padding: 10px 0 4px; }
+  .succ .ck { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 12px; display: grid; place-items: center; color: #fff; background: linear-gradient(180deg,#22c55e,#0f9d52); box-shadow: 0 10px 20px rgba(15,157,82,.35), inset 0 3px 5px rgba(255,255,255,.5), inset 0 -6px 10px rgba(8,90,46,.4); }
+  .succ .ck .icon { font-size: 32px; }
+  .succ .st { font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 15px; }
+  .succ .ss { font-size: 12px; color: var(--muted); font-weight: 700; }
 
-  /* 時間軸 */
-  .tl { margin: 4px 2px; }
-  .tl .ti { display: flex; gap: 11px; }
-  .tl .ti .rail { display: flex; flex-direction: column; align-items: center; }
-  .tl .ti .pt { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex: none; background: #eef0f3; color: #aeb3bc; border: 2px solid #eef0f3; }
-  .tl .ti .pt .icon { font-size: 13px; }
-  .tl .ti.done .pt { background: var(--ok-bg); color: var(--ok); border-color: rgba(24,165,88,.3); }
-  .tl .ti.now .pt { background: var(--brand-grad); color: #fff; border-color: transparent; box-shadow: 0 0 0 4px var(--brand-12); }
-  .tl .ti .line { width: 2px; flex: 1; min-height: 16px; background: #eef0f3; margin: 2px 0; }
-  .tl .ti.done .line { background: rgba(24,165,88,.4); }
-  .tl .ti .lab { padding-bottom: 12px; }
-  .tl .ti .lab b { font-size: 12.5px; font-weight: 700; }
-  .tl .ti .lab small { display: block; color: var(--muted); font-size: 11px; }
-
-  /* 名下訂單清單 */
-  .olist { display: flex; flex-direction: column; gap: 8px; }
-  .orow { display: flex; align-items: center; gap: 9px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 9px 11px; }
+  .olist { display: flex; flex-direction: column; gap: 9px; }
+  .orow { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 15px; padding: 10px 12px; box-shadow: var(--clay); }
   .orow .oinfo { flex: 1; min-width: 0; }
-  .orow .ono { font-family: ui-monospace, Consolas, monospace; font-size: 11px; font-weight: 700; }
-  .orow .oamt { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
-  .orow .go { color: #c2c6cd; font-size: 14px; flex: none; }
-  .listcap { font-size: 10.5px; color: var(--muted); font-weight: 700; margin: 2px 0 8px; }
+  .orow .ono { font-family: "Fredoka",sans-serif; font-size: 11.5px; font-weight: 700; }
+  .orow .oamt { font-size: 10.5px; color: var(--muted); margin-top: 1px; font-weight: 700; }
+  .orow .go { color: #c2c6cd; font-size: 15px; flex: none; }
+  .listcap { font-size: 11px; color: var(--muted); font-weight: 800; margin: 4px 0 9px; }
 
-  /* ───── 後台桌面框 ───── */
-  .browser { border-radius: var(--r-lg); overflow: hidden; margin-top: 12px; box-shadow: var(--sh); border: 1px solid var(--glass-line); background: #fff; }
-  .browser .chrome { background: rgba(248,246,249,.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 12px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); }
+  /* ───── 後台 ───── */
+  .browser { border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--clay); background: #fff; }
+  .browser .chrome { background: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 13px; border-bottom: 2px solid var(--line); }
   .browser .dots { display: flex; gap: 7px; }
-  .browser .dots i { width: 11px; height: 11px; border-radius: 50%; }
-  .browser .urlbar { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 7px; }
-  .browser .urlbar .icon { font-size: 13px; color: var(--ok); }
+  .browser .dots i { width: 12px; height: 12px; border-radius: 50%; }
+  .browser .urlbar { flex: 1; background: var(--bg); border-radius: 999px; padding: 7px 16px; font-size: 12.5px; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: inset 0 2px 4px rgba(15,23,42,.05); }
+  .browser .urlbar .icon { font-size: 14px; color: var(--c-green); }
 
-  .admin { display: grid; grid-template-columns: 168px 1fr; min-height: 320px; }
-  .admin .side { background: linear-gradient(180deg,#fff,#fdf7f7); border-right: 1px solid var(--line); padding: 18px 12px; }
-  .admin .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; margin-bottom: 18px; padding: 0 6px; }
-  .admin .brand .logo { width: 26px; height: 26px; border-radius: 9px; background: var(--brand-grad); color: #fff; display: grid; place-items: center; box-shadow: 0 4px 10px var(--brand-glow); }
-  .admin .brand .logo .icon { font-size: 15px; }
-  .admin .nav { display: flex; flex-direction: column; gap: 3px; }
-  .admin .nav a { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--ink-2); padding: 9px 11px; border-radius: 12px; font-weight: 600; text-decoration: none; }
-  .admin .nav a .icon { font-size: 15px; color: var(--muted); }
-  .admin .nav a.on { background: var(--brand-08); color: var(--brand-ink); }
-  .admin .nav a.on .icon { color: var(--brand); }
-  .admin .main { padding: 20px 22px; min-width: 0; }
-  .admin .mhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-  .admin .mhead h4 { margin: 0; font-size: 16px; }
-  .admin .pill-sm { font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--line); color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+  .admin { display: grid; grid-template-columns: 184px 1fr; min-height: 340px; }
+  .admin .side { background: var(--bg); padding: 22px 14px; }
+  .admin .brand { display: flex; align-items: center; gap: 10px; font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 16px; margin-bottom: 22px; padding: 0 6px; }
+  .admin .brand .logo { width: 32px; height: 32px; border-radius: 11px; background: linear-gradient(180deg,#ff5a4d,#d11414); color: #fff; display: grid; place-items: center; box-shadow: 0 6px 12px rgba(209,20,20,.32), inset 0 2px 3px rgba(255,255,255,.4); }
+  .admin .brand .logo .icon { font-size: 17px; }
+  .admin .nav { display: flex; flex-direction: column; gap: 5px; }
+  .admin .nav a { display: flex; align-items: center; gap: 11px; font-size: 13px; color: var(--ink-2); padding: 11px 13px; border-radius: 13px; font-weight: 700; text-decoration: none; transition: background .2s, color .2s; }
+  .admin .nav a .icon { font-size: 16px; color: var(--muted); }
+  .admin .nav a:hover { background: #fff; }
+  .admin .nav a.on { background: var(--c-red-bg); color: var(--c-red); box-shadow: var(--clay); }
+  .admin .nav a.on .icon { color: var(--red); }
+  .admin .main { padding: 24px 26px; min-width: 0; }
+  .admin .mhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .admin .mhead h4 { margin: 0; font-size: 18px; }
+  .admin .pill-sm { font-size: 11.5px; font-weight: 800; padding: 7px 14px; border-radius: 999px; background: var(--c-green-bg); color: var(--c-green); display: inline-flex; gap: 7px; align-items: center; }
 
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
-  .stat { border-radius: 16px; padding: 14px; border: 1px solid var(--line); background: linear-gradient(135deg,#fff,#fcfcfd); }
-  .stat .sl { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-  .stat .sl .icon { font-size: 13px; }
-  .stat .sv { font-size: 22px; font-weight: 800; margin-top: 6px; letter-spacing: -.5px; }
-  .stat.hot { background: var(--brand-grad); border-color: transparent; box-shadow: var(--sh-glow); }
-  .stat.hot .sl, .stat.hot .sv { color: #fff; }
-  .stat.hot .sl { opacity: .92; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+  .stat { border-radius: 18px; padding: 16px; box-shadow: var(--blob-clay); }
+  .stat .sl { font-size: 11.5px; font-weight: 800; display: flex; align-items: center; gap: 7px; opacity: .85; }
+  .stat .sl .icon { font-size: 14px; }
+  .stat .sv { font-family: "Fredoka",sans-serif; font-weight: 700; font-size: 26px; margin-top: 8px; letter-spacing: -.5px; }
+  .stat.s-hot { background: var(--c-red-bg); color: var(--c-red); }
+  .stat.s-ship { background: var(--c-teal-bg); color: var(--c-teal); }
+  .stat.s-rev { background: var(--c-green-bg); color: var(--c-green); }
 
-  table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12.5px; }
-  table.tbl th { text-align: left; color: var(--muted); font-weight: 700; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; font-size: 11.5px; }
-  table.tbl td { padding: 11px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  table.tbl th { text-align: left; color: var(--muted); font-weight: 800; padding: 11px 13px; border-bottom: 2px solid var(--line); white-space: nowrap; font-size: 11.5px; }
+  table.tbl td { padding: 13px; border-bottom: 1px solid var(--line); white-space: nowrap; font-weight: 700; }
   table.tbl tr:last-child td { border-bottom: none; }
-  table.tbl td.mono { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
-  .tg { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; padding: 5px 11px; border-radius: 999px; }
-  .tg .icon { font-size: 12px; }
-  .tg-wait { background: var(--wait-bg); color: var(--wait); }
-  .tg-rep { background: var(--sys-bg); color: var(--sys); }
-  .tg-ok { background: var(--ok-bg); color: var(--ok); }
-  .tg-warn { background: var(--brand-08); color: var(--brand-ink); }
-  .btn-sm { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 999px; margin-right: 5px; cursor: pointer; }
-  .btn-sm.primary { background: var(--brand-grad); color: #fff; box-shadow: 0 4px 12px var(--brand-glow); }
-  .btn-sm.ghost { background: #fff; color: var(--muted); border: 1px solid var(--line); }
+  table.tbl td.mono { font-family: "Fredoka",sans-serif; font-size: 12.5px; }
+  .tg { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 999px; }
+  .tg .icon { font-size: 13px; }
+  .tg-wait { background: var(--c-amber-bg); color: var(--c-amber); }
+  .tg-rep { background: var(--c-violet-bg); color: var(--c-violet); }
+  .tg-ok { background: var(--c-green-bg); color: var(--c-green); }
+  .tg-warn { background: var(--c-red-bg); color: var(--c-red); }
+  .abtn { display: inline-flex; align-items: center; gap: 5px; font-family: "Fredoka",sans-serif; font-size: 11.5px; font-weight: 600; padding: 7px 13px; border-radius: 11px; margin-right: 6px; cursor: pointer; transition: transform .15s var(--ease), box-shadow .15s var(--ease); }
+  .abtn.primary { background: linear-gradient(180deg,#fb8c3c,#d9480a); color: #fff; box-shadow: 0 5px 11px rgba(217,72,10,.34); }
+  .abtn.primary:hover { transform: translateY(-2px); box-shadow: 0 9px 16px rgba(217,72,10,.42); }
+  .abtn.ghost { background: var(--bg); color: var(--muted); }
+  .abtn.ghost:hover { background: #fff; box-shadow: var(--clay); }
 
   /* ───── 狀態機 ───── */
-  .states { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-  .pill { font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--glass-strong); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-  .pill.start { background: var(--wait-bg); color: var(--wait); border-color: rgba(232,115,12,.25); }
-  .pill.end { background: var(--brand-grad); color: #fff; border-color: transparent; box-shadow: var(--sh-glow); }
-  .pill.warn { background: var(--brand-08); color: var(--brand-ink); border-color: var(--brand-18); }
-  .sep { color: var(--brand); opacity: .55; display: inline-flex; }
-  .sep .icon { font-size: 16px; }
-  .branch { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; margin-top: 4px; }
-  .branch .bx { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; padding: 14px 16px; }
+  .states { display: flex; flex-wrap: wrap; gap: 11px; align-items: center; }
+  .pill { font-family: "Fredoka",sans-serif; font-size: 14px; font-weight: 600; padding: 10px 20px; border-radius: 999px; background: #fff; box-shadow: var(--clay); }
+  .pill.start { background: var(--c-amber-bg); color: var(--c-amber); }
+  .pill.end { background: var(--c-green-bg); color: var(--c-green); }
+  .pill.warn { background: var(--c-red-bg); color: var(--c-red); }
+  .sep { color: var(--red); opacity: .5; display: inline-flex; } .sep .icon { font-size: 17px; }
+  .branch { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .branch .bx { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 16px 18px; }
 
   /* ───── 卡片群 ───── */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(228px, 1fr)); gap: 18px; margin-top: 10px; }
-  .ccard { padding: 22px; transition: transform .25s ease, box-shadow .25s ease; }
-  .ccard:hover { transform: translateY(-5px); box-shadow: var(--sh); }
-  .ccard .ic-top { width: 46px; height: 46px; border-radius: 15px; display: grid; place-items: center; font-size: 21px; margin-bottom: 14px; background: var(--brand-08); color: var(--brand); border: 1px solid var(--brand-18); }
-  .ccard h3 { margin: 0 0 12px; font-size: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(232px, 1fr)); gap: 20px; }
+  .ccard { padding: 26px; }
+  .ccard .blob { width: 52px; height: 52px; font-size: 24px; margin-bottom: 16px; }
+  .ccard h3 { margin: 0 0 14px; font-size: 19px; }
   .ccard ul { margin: 0; padding: 0; list-style: none; }
-  .ccard li { display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; color: var(--ink-2); margin: 7px 0; }
-  .ccard li .icon { color: var(--brand); font-size: 15px; flex: none; margin-top: 3px; }
-  .ccard li .opt { color: var(--muted); font-size: 12px; }
+  .ccard li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--ink-2); margin: 9px 0; font-weight: 600; }
+  .ccard li .icon { color: var(--c-green); font-size: 16px; flex: none; margin-top: 3px; }
+  .ccard li .opt { color: var(--muted); font-size: 12.5px; }
 
-  /* 兩種入口 */
-  .entry { position: relative; overflow: hidden; }
-  .entry .way { position: absolute; top: 18px; right: 18px; background: var(--brand-grad); color: #fff; font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 999px; box-shadow: 0 4px 10px var(--brand-glow); }
-  .entry code { background: var(--brand-08); color: var(--brand-ink); padding: 2px 7px; border-radius: 7px; word-break: break-all; }
+  .entry { position: relative; }
+  .entry .way { position: absolute; top: 22px; right: 22px; font-family: "Fredoka",sans-serif; background: var(--c-red-bg); color: var(--c-red); font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 999px; box-shadow: var(--clay); }
+  .entry code { background: var(--c-orange-bg); color: var(--c-orange); padding: 3px 8px; border-radius: 8px; word-break: break-all; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
 
   /* ───── 通知範例 ───── */
-  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; }
-  .note { border-radius: var(--r); overflow: hidden; box-shadow: var(--sh); background: #14161d; border: 1px solid rgba(255,255,255,.06); }
-  .note .nh { padding: 13px 18px; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 9px; color: #e6e8ee; border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.04); }
-  .note .nh .ava { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--brand-grad); color: #fff; flex: none; }
-  .note .nh .ava .icon { font-size: 15px; }
-  .note .nb { padding: 16px 18px; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; white-space: pre-wrap; color: #c7cbd4; line-height: 1.85; }
-  .note.alert { border-color: rgba(255,45,45,.3); }
-  .note.alert .nh { background: rgba(255,45,45,.14); color: #ff9b9b; }
-  .note .em { color: #ff7676; font-weight: 700; }
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .note { border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--clay); background: #171a21; }
+  .note .nh { padding: 15px 20px; font-family: "Fredoka",sans-serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; color: #f1f3f7; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .note .nh .ava { width: 32px; height: 32px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(180deg,#ff5a4d,#d11414); color: #fff; flex: none; box-shadow: inset 0 2px 3px rgba(255,255,255,.35); }
+  .note .nh .ava .icon { font-size: 16px; }
+  .note .nb { padding: 18px 20px; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; white-space: pre-wrap; color: #c9cdd6; line-height: 1.9; font-weight: 400; }
+  .note.alert .nh { background: rgba(255,45,45,.15); color: #ff9b9b; }
+  .note.alert .nh .ava { background: rgba(255,90,90,.2); }
+  .note .em { color: #ff8585; font-weight: 700; }
 
-  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 36px 22px 48px; }
-  footer .fline { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  footer code { background: rgba(20,18,24,.06); padding: 2px 8px; border-radius: 8px; }
-  code { font-family: ui-monospace, Consolas, monospace; font-size: .92em; }
+  footer { text-align: center; color: var(--muted); font-size: 13.5px; padding: 56px 24px; font-weight: 700; }
+  footer code { background: #fff; padding: 3px 9px; border-radius: 9px; box-shadow: var(--clay); font-family: ui-monospace, Consolas, monospace; }
 
-  @media (max-width: 720px) {
+  /* ───── 響應式 ───── */
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 28px; }
+    .hero-art { max-width: 360px; }
     .overview { grid-template-columns: 1fr 1fr; }
-    .ov:nth-child(2) .arr, .ov:nth-child(4) .arr { display: none; }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 0 18px; }
+    .overview { grid-template-columns: 1fr; }
     .stats { grid-template-columns: 1fr; }
     .admin { grid-template-columns: 1fr; }
     .admin .side { display: none; }
+    .step { padding: 18px; gap: 14px; }
+    .sub { padding-left: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    .hero-art, .tile { transform: none !important; }
   }
 </style>
 </head>
@@ -425,332 +375,355 @@
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 2.9 6.26 6.84.66-5.12 4.57 1.49 6.71L12 17.27 5.89 20.2l1.49-6.71L2.26 8.92l6.84-.66z"/></symbol>
     <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></symbol>
+    <symbol id="i-cherry" viewBox="0 0 24 24"><path d="M2 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3z"/><path d="M12 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3z"/><path d="M7 14c3.22-2.91 4.29-8.75 5-12 1.66 2.38 4.94 9 5 12"/><path d="M22 9c-4.29 0-7.14-2.33-10-7 5.71 0 10 4.67 10 7z"/></symbol>
   </defs>
 </svg>
 
-<header>
-  <span class="chip"><span class="dot"></span>流程說明 · 給需求者閱讀</span>
-  <h1><span class="accent">FreshMart</span> 簡易下單系統</h1>
-  <p>無會員、無金流的下單網站。顧客以「手機號碼 + 查詢碼 + 轉帳末五碼」完成下單與付款回報，管理者核帳後出貨，全程可線上查詢進度。</p>
-  <div class="hero-tags">
-    <span class="htag"><svg class="icon"><use href="#i-bag"/></svg>線上下單</span>
-    <span class="htag"><svg class="icon"><use href="#i-card"/></svg>轉帳回報</span>
-    <span class="htag"><svg class="icon"><use href="#i-bell"/></svg>即時通知</span>
-    <span class="htag"><svg class="icon"><use href="#i-truck"/></svg>出貨查詢</span>
+<header class="wrap">
+  <div class="hero">
+    <div class="hero-text">
+      <span class="pill-badge"><span class="dot"></span>流程說明 · 給需求者閱讀</span>
+      <h1><span class="accent">FreshMart</span><br>簡易下單系統</h1>
+      <p>無會員、無金流的下單網站。顧客以「手機 + 姓名 + 轉帳末五碼」完成下單與付款回報，管理者核帳後出貨，全程可線上查詢進度。</p>
+      <div class="hero-tags">
+        <span class="htag"><svg class="icon" style="color:var(--c-red)"><use href="#i-bag"/></svg>線上下單</span>
+        <span class="htag"><svg class="icon" style="color:var(--c-orange)"><use href="#i-card"/></svg>轉帳回報</span>
+        <span class="htag"><svg class="icon" style="color:var(--c-violet)"><use href="#i-bell"/></svg>即時通知</span>
+        <span class="htag"><svg class="icon" style="color:var(--c-teal)"><use href="#i-truck"/></svg>出貨查詢</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="tile t1"><div class="ti"><svg class="icon"><use href="#i-bag"/></svg></div><div class="tn">下單</div><div class="ts">挑商品結帳</div></div>
+      <div class="tile t2"><div class="ti"><svg class="icon"><use href="#i-card"/></svg></div><div class="tn">回報</div><div class="ts">填末五碼</div></div>
+      <div class="tile t3"><div class="ti"><svg class="icon"><use href="#i-check"/></svg></div><div class="tn">核帳</div><div class="ts">確認出貨</div></div>
+      <div class="tile t4"><div class="ti"><svg class="icon"><use href="#i-search"/></svg></div><div class="tn">查詢</div><div class="ts">看進度</div></div>
+    </div>
   </div>
 </header>
 
 <div class="wrap">
 
   <!-- 0. 一眼看懂 -->
-  <h2><span class="num">0</span>一眼看懂整個系統</h2>
-  <p class="sub">四個關鍵環節，從顧客下單到收貨查詢形成完整閉環。</p>
-  <div class="overview">
-    <div class="ov"><span class="step-no">01</span><div class="ring"><svg class="icon"><use href="#i-bag"/></svg></div><div class="h">顧客下單</div><div class="t">挑商品、填資料，取得訂單編號與查詢碼</div><div class="arr"><svg class="icon"><use href="#i-arrow"/></svg></div></div>
-    <div class="ov"><span class="step-no">02</span><div class="ring"><svg class="icon"><use href="#i-card"/></svg></div><div class="h">轉帳回報</div><div class="t">自行轉帳後，回網站填寫末五碼回報</div><div class="arr"><svg class="icon"><use href="#i-arrow"/></svg></div></div>
-    <div class="ov"><span class="step-no">03</span><div class="ring"><svg class="icon"><use href="#i-check"/></svg></div><div class="h">核帳出貨</div><div class="t">管理者收到通知、確認入帳後安排出貨</div><div class="arr"><svg class="icon"><use href="#i-arrow"/></svg></div></div>
-    <div class="ov"><span class="step-no">04</span><div class="ring"><svg class="icon"><use href="#i-search"/></svg></div><div class="h">查詢進度</div><div class="t">顧客用手機 + 姓名查看名下所有訂單</div></div>
-  </div>
+  <section>
+    <div class="shead"><span class="num">0</span><h2>一眼看懂整個系統</h2></div>
+    <p class="sub">四個關鍵環節，從顧客下單到收貨查詢形成完整閉環。</p>
+    <div class="overview">
+      <div class="card hoverable ov"><span class="no">01</span><div class="blob red"><svg class="icon"><use href="#i-bag"/></svg></div><div class="h">顧客下單</div><div class="t">挑商品、填資料，取得訂單編號與查詢碼</div></div>
+      <div class="card hoverable ov"><span class="no">02</span><div class="blob orange"><svg class="icon"><use href="#i-card"/></svg></div><div class="h">轉帳回報</div><div class="t">自行轉帳後，回網站填寫末五碼回報</div></div>
+      <div class="card hoverable ov"><span class="no">03</span><div class="blob green"><svg class="icon"><use href="#i-check"/></svg></div><div class="h">核帳出貨</div><div class="t">管理者收到通知、確認入帳後安排出貨</div></div>
+      <div class="card hoverable ov"><span class="no">04</span><div class="blob blue"><svg class="icon"><use href="#i-search"/></svg></div><div class="h">查詢進度</div><div class="t">顧客用手機 + 姓名查看名下所有訂單</div></div>
+    </div>
 
-  <div class="legend">
-    <span class="tag t-user"><svg class="icon"><use href="#i-user"/></svg>顧客操作</span>
-    <span class="tag t-sys"><svg class="icon"><use href="#i-cpu"/></svg>系統自動</span>
-    <span class="tag t-admin"><svg class="icon"><use href="#i-gear"/></svg>管理者操作</span>
-  </div>
+    <div class="legend">
+      <span class="tag t-user"><svg class="icon"><use href="#i-user"/></svg>顧客操作</span>
+      <span class="tag t-sys"><svg class="icon"><use href="#i-cpu"/></svg>系統自動</span>
+      <span class="tag t-admin"><svg class="icon"><use href="#i-gear"/></svg>管理者操作</span>
+    </div>
+  </section>
 
   <!-- 1. 完整流程 -->
-  <h2><span class="num">1</span>完整流程（七步閉環）</h2>
-  <p class="sub">下方標示每一步「由誰操作」，以及操作後訂單會進入什麼狀態。</p>
-  <div class="flow">
+  <section>
+    <div class="shead"><span class="num">1</span><h2>完整流程（七步閉環）</h2></div>
+    <p class="sub">下方標示每一步「由誰操作」，以及操作後訂單會進入什麼狀態。</p>
+    <div class="flow">
 
-    <div class="step user">
-      <div class="badge-ico"><svg class="icon"><use href="#i-bag"/></svg></div>
-      <div class="body">
-        <div class="rolerow"><span class="role">顧客</span><span class="nidx">STEP 1</span></div>
-        <div class="title">瀏覽商品並下單</div>
-        <div class="desc">瀏覽商品、加入購物車，結帳時填寫姓名、手機號碼、收件地址（LINE ID／備註可選）。</div>
+      <div class="card hoverable step user">
+        <div class="blob blue"><svg class="icon"><use href="#i-bag"/></svg></div>
+        <div class="body">
+          <div class="rolerow"><span class="role">顧客</span><span class="nidx">STEP 1</span></div>
+          <div class="title">瀏覽商品並下單</div>
+          <div class="desc">瀏覽商品、加入購物車，結帳時填寫姓名、手機號碼、收件地址（LINE ID／備註可選）。</div>
+        </div>
       </div>
-    </div>
 
-    <div class="step sys">
-      <div class="badge-ico"><svg class="icon"><use href="#i-cpu"/></svg></div>
-      <div class="body">
-        <div class="rolerow"><span class="role">系統</span><span class="nidx">STEP 2</span></div>
-        <div class="title">建立訂單，產生編號與查詢碼</div>
-        <div class="desc">自動產生訂單編號、查詢碼與付款資訊（金額、銀行、帳號），顯示於訂單完成頁。</div>
-        <span class="status s-wait"><svg class="icon"><use href="#i-clock"/></svg>狀態：待付款</span>
+      <div class="card hoverable step sys">
+        <div class="blob violet"><svg class="icon"><use href="#i-cpu"/></svg></div>
+        <div class="body">
+          <div class="rolerow"><span class="role">系統</span><span class="nidx">STEP 2</span></div>
+          <div class="title">建立訂單，產生編號與查詢碼</div>
+          <div class="desc">自動產生訂單編號、查詢碼與付款資訊（金額、銀行、帳號），顯示於訂單完成頁。</div>
+          <span class="status s-wait"><svg class="icon"><use href="#i-clock"/></svg>狀態：待付款</span>
+        </div>
       </div>
-    </div>
 
-    <div class="step user">
-      <div class="badge-ico"><svg class="icon"><use href="#i-card"/></svg></div>
-      <div class="body">
-        <div class="rolerow"><span class="role">顧客</span><span class="nidx">STEP 3</span></div>
-        <div class="title">自行轉帳並回報付款</div>
-        <div class="desc">完成轉帳後，從「我已付款」連結，或用「手機 + 姓名」查到訂單後進入回報頁，填寫轉帳末五碼、金額、時間。</div>
-        <span class="status s-reported"><svg class="icon"><use href="#i-clip"/></svg>狀態：已回報付款</span>
+      <div class="card hoverable step user">
+        <div class="blob blue"><svg class="icon"><use href="#i-card"/></svg></div>
+        <div class="body">
+          <div class="rolerow"><span class="role">顧客</span><span class="nidx">STEP 3</span></div>
+          <div class="title">自行轉帳並回報付款</div>
+          <div class="desc">完成轉帳後，從「我已付款」連結，或用「手機 + 姓名」查到訂單後進入回報頁，填寫轉帳末五碼、金額、時間。</div>
+          <span class="status s-reported"><svg class="icon"><use href="#i-clip"/></svg>狀態：已回報付款</span>
+        </div>
       </div>
-    </div>
 
-    <div class="step sys">
-      <div class="badge-ico"><svg class="icon"><use href="#i-bell"/></svg></div>
-      <div class="body">
-        <div class="rolerow"><span class="role">系統</span><span class="nidx">STEP 4</span></div>
-        <div class="title">即時通知管理者</div>
-        <div class="desc">透過 Telegram Bot 通知（Email 備援），內含訂單與回報明細；回報金額與訂單金額不符時會特別標示異常。</div>
+      <div class="card hoverable step sys">
+        <div class="blob violet"><svg class="icon"><use href="#i-bell"/></svg></div>
+        <div class="body">
+          <div class="rolerow"><span class="role">系統</span><span class="nidx">STEP 4</span></div>
+          <div class="title">即時通知管理者</div>
+          <div class="desc">透過 Telegram Bot 通知（Email 備援），內含訂單與回報明細；回報金額與訂單金額不符時會特別標示異常。</div>
+        </div>
       </div>
-    </div>
 
-    <div class="step admin">
-      <div class="badge-ico"><svg class="icon"><use href="#i-check"/></svg></div>
-      <div class="body">
-        <div class="rolerow"><span class="role">管理者</span><span class="nidx">STEP 5</span></div>
-        <div class="title">後台核帳</div>
-        <div class="desc">核對銀行入帳資料，可操作「確認收款」「付款異常」或「取消訂單」。</div>
-        <span class="status s-confirmed"><svg class="icon"><use href="#i-check"/></svg>狀態：已確認收款</span>
+      <div class="card hoverable step admin">
+        <div class="blob orange"><svg class="icon"><use href="#i-check"/></svg></div>
+        <div class="body">
+          <div class="rolerow"><span class="role">管理者</span><span class="nidx">STEP 5</span></div>
+          <div class="title">後台核帳</div>
+          <div class="desc">核對銀行入帳資料，可操作「確認收款」「付款異常」或「取消訂單」。</div>
+          <span class="status s-confirmed"><svg class="icon"><use href="#i-check"/></svg>狀態：已確認收款</span>
+        </div>
       </div>
-    </div>
 
-    <div class="step admin">
-      <div class="badge-ico"><svg class="icon"><use href="#i-truck"/></svg></div>
-      <div class="body">
-        <div class="rolerow"><span class="role">管理者</span><span class="nidx">STEP 6</span></div>
-        <div class="title">備貨、出貨並更新狀態</div>
-        <div class="desc">出貨後在後台更新出貨狀態、出貨時間、物流方式（物流單號／備註可選）。</div>
-        <span class="status s-shipped"><svg class="icon"><use href="#i-truck"/></svg>狀態：已出貨</span>
+      <div class="card hoverable step admin">
+        <div class="blob orange"><svg class="icon"><use href="#i-truck"/></svg></div>
+        <div class="body">
+          <div class="rolerow"><span class="role">管理者</span><span class="nidx">STEP 6</span></div>
+          <div class="title">備貨、出貨並更新狀態</div>
+          <div class="desc">出貨後在後台更新出貨狀態、出貨時間、物流方式（物流單號／備註可選）。</div>
+          <span class="status s-shipped"><svg class="icon"><use href="#i-truck"/></svg>狀態：已出貨</span>
+        </div>
       </div>
-    </div>
 
-    <div class="step user">
-      <div class="badge-ico"><svg class="icon"><use href="#i-search"/></svg></div>
-      <div class="body">
-        <div class="rolerow"><span class="role">顧客</span><span class="nidx">STEP 7</span></div>
-        <div class="title">查詢訂單進度</div>
-        <div class="desc">用手機號碼 + 姓名查詢名下所有訂單的付款狀態、出貨狀態、物流資訊與更新時間。</div>
+      <div class="card hoverable step user">
+        <div class="blob blue"><svg class="icon"><use href="#i-search"/></svg></div>
+        <div class="body">
+          <div class="rolerow"><span class="role">顧客</span><span class="nidx">STEP 7</span></div>
+          <div class="title">查詢訂單進度</div>
+          <div class="desc">用手機號碼 + 姓名查詢名下所有訂單的付款狀態、出貨狀態、物流資訊與更新時間。</div>
+        </div>
       </div>
-    </div>
 
-  </div>
+    </div>
+  </section>
 
   <!-- 2. 畫面示意 -->
-  <h2><span class="num">2</span>關鍵畫面示意</h2>
-  <p class="sub">以下為示意稿（非最終設計），用來幫助理解每一步顧客／管理者實際會看到的畫面。</p>
+  <section>
+    <div class="shead"><span class="num">2</span><h2>關鍵畫面示意</h2></div>
+    <p class="sub">以下為示意稿（非最終設計），用來幫助理解每一步顧客／管理者實際會看到的畫面。</p>
 
-  <div class="shots">
+    <div class="shots">
 
-    <!-- 1 商城 -->
-    <div class="shot">
-      <div class="phone">
-        <div class="notch"></div>
-        <div class="pbar glassbar">
-          <div class="ptitle"><svg class="icon"><use href="#i-store"/></svg>FreshMart 生鮮</div>
-          <div class="psearch"><svg class="icon" style="font-size:14px"><use href="#i-search"/></svg>搜尋想買的商品…</div>
-        </div>
-        <div class="pbody">
-          <div class="chips"><span class="c on">全部</span><span class="c">蔬菜</span><span class="c">水果</span><span class="c">熟食</span></div>
-          <div class="pgrid">
-            <div class="pcard"><div class="pimg g1">🥬</div><div class="pmeta"><div class="pn">有機蔬菜箱</div><div class="rate"><svg class="icon fill"><use href="#i-star"/></svg>4.9 <span>(126)</span></div><div class="prow"><span class="pp">$680</span><span class="add"><svg class="icon"><use href="#i-cart"/></svg></span></div></div></div>
-            <div class="pcard"><div class="pimg g3">🍎</div><div class="pmeta"><div class="pn">當季水果組</div><div class="rate"><svg class="icon fill"><use href="#i-star"/></svg>4.8 <span>(88)</span></div><div class="prow"><span class="pp">$600</span><span class="add"><svg class="icon"><use href="#i-cart"/></svg></span></div></div></div>
+      <!-- 1 商城 -->
+      <div class="shot">
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="pbar">
+            <div class="ptitle"><svg class="icon"><use href="#i-store"/></svg>FreshMart 生鮮</div>
+            <div class="psearch"><svg class="icon" style="font-size:14px"><use href="#i-search"/></svg>搜尋想買的商品…</div>
           </div>
-          <div class="fab-cart"><span class="l"><svg class="icon"><use href="#i-cart"/></svg>購物車 · 2 件</span><span class="pricetag">$1,280 ›</span></div>
-        </div>
-      </div>
-      <div class="cap"><b>① 商城 / 購物車</b><span>挑選商品加入購物車</span></div>
-    </div>
-
-    <!-- 2 結帳 -->
-    <div class="shot">
-      <div class="phone">
-        <div class="notch"></div>
-        <div class="pbar"><div class="ptitle"><span class="back">‹</span>填寫訂購資料</div></div>
-        <div class="pbody">
-          <div class="ifield focus"><span class="lbl">姓名 <span class="req">*</span></span><div class="val">王小明</div></div>
-          <div class="ifield"><span class="lbl">手機號碼 <span class="req">*</span></span><div class="val">0912-345-789</div></div>
-          <div class="ifield"><span class="lbl">收件地址 <span class="req">*</span></span><div class="val">台北市信義區…</div></div>
-          <div class="ifield"><span class="lbl">LINE ID（選填）</span><div class="ph">未填寫</div></div>
-          <div class="cta"><svg class="icon"><use href="#i-check"/></svg>送出訂單</div>
-        </div>
-      </div>
-      <div class="cap"><b>② 結帳填寫</b><span>填基本訂購資料</span></div>
-    </div>
-
-    <!-- 3 訂單完成 -->
-    <div class="shot">
-      <div class="phone">
-        <div class="notch"></div>
-        <div class="pbar"><div class="ptitle">訂單完成</div></div>
-        <div class="pbody">
-          <div class="succ"><div class="ck"><svg class="icon"><use href="#i-check"/></svg></div><div class="st">訂單建立成功！</div><div class="ss">請於 24 小時內完成轉帳</div></div>
-          <div class="sumcard">
-            <div class="srow"><span class="k">訂單編號</span><span class="v code">F202605300001</span></div>
-            <div class="srow"><span class="k">查詢碼</span><span class="v code">728391</span></div>
-            <div class="srow"><span class="k">轉帳帳號</span><span class="v">XXX-XXXX-XXXX</span></div>
-            <div class="srow total"><span class="k">應付金額</span><span class="v">$1,280</span></div>
-          </div>
-          <div class="cta"><svg class="icon"><use href="#i-card"/></svg>我已付款</div>
-          <div class="cta ghost"><svg class="icon"><use href="#i-search"/></svg>稍後查詢訂單</div>
-        </div>
-      </div>
-      <div class="cap"><b>③ 訂單完成頁</b><span>顯示查詢碼與轉帳資訊</span></div>
-    </div>
-
-    <!-- 4 付款回報 -->
-    <div class="shot">
-      <div class="phone">
-        <div class="notch"></div>
-        <div class="pbar"><div class="ptitle"><span class="back">‹</span>回報付款</div></div>
-        <div class="pbody">
-          <div class="ifield focus"><span class="lbl">轉帳末五碼 <span class="req">*</span></span><div class="val mono">12345</div></div>
-          <div class="ifield"><span class="lbl">轉帳金額 <span class="req">*</span></span><div class="val">$1,280</div></div>
-          <div class="ifield"><span class="lbl">轉帳時間 <span class="req">*</span></span><div class="val">2026/05/30 15:32</div></div>
-          <div class="ifield"><span class="lbl">轉帳人姓名（選填）</span><div class="ph">未填寫</div></div>
-          <div class="cta"><svg class="icon"><use href="#i-clip"/></svg>送出回報</div>
-        </div>
-      </div>
-      <div class="cap"><b>④ 我已付款（回報）</b><span>填轉帳末五碼回報</span></div>
-    </div>
-
-    <!-- 5 訂單查詢 -->
-    <div class="shot">
-      <div class="phone">
-        <div class="notch"></div>
-        <div class="pbar"><div class="ptitle"><svg class="icon"><use href="#i-search"/></svg>查詢我的訂單</div></div>
-        <div class="pbody">
-          <div class="ifield focus"><span class="lbl">手機號碼 <span class="req">*</span></span><div class="val">0912-345-789</div></div>
-          <div class="ifield"><span class="lbl">姓名 <span class="req">*</span></span><div class="val">王小明</div></div>
-          <div class="cta" style="margin-bottom:13px"><svg class="icon"><use href="#i-search"/></svg>查詢訂單</div>
-          <div class="listcap">名下相關訂單 · 共 2 筆</div>
-          <div class="olist">
-            <div class="orow">
-              <div class="oinfo"><div class="ono">F202605300001</div><div class="oamt">$1,280 · 05/30</div></div>
-              <span class="tg tg-ok"><svg class="icon"><use href="#i-truck"/></svg>已出貨</span>
-              <svg class="icon go"><use href="#i-chev"/></svg>
+          <div class="pbody">
+            <div class="chips"><span class="c on">全部</span><span class="c">蔬菜</span><span class="c">水果</span><span class="c">熟食</span></div>
+            <div class="pgrid">
+              <div class="pcard"><div class="pimg g1"><svg class="icon"><use href="#i-leaf"/></svg></div><div class="pmeta"><div class="pn">有機蔬菜箱</div><div class="rate"><svg class="icon fill"><use href="#i-star"/></svg>4.9 <span>(126)</span></div><div class="prow"><span class="pp">$680</span><span class="add"><svg class="icon"><use href="#i-cart"/></svg></span></div></div></div>
+              <div class="pcard"><div class="pimg g3"><svg class="icon"><use href="#i-cherry"/></svg></div><div class="pmeta"><div class="pn">當季水果組</div><div class="rate"><svg class="icon fill"><use href="#i-star"/></svg>4.8 <span>(88)</span></div><div class="prow"><span class="pp">$600</span><span class="add"><svg class="icon"><use href="#i-cart"/></svg></span></div></div></div>
             </div>
-            <div class="orow">
-              <div class="oinfo"><div class="ono">F202605280042</div><div class="oamt">$640 · 05/28</div></div>
-              <span class="tg tg-wait"><svg class="icon"><use href="#i-clock"/></svg>待付款</span>
-              <svg class="icon go"><use href="#i-chev"/></svg>
+            <div class="fab-cart"><span class="l"><svg class="icon"><use href="#i-cart"/></svg>購物車 · 2 件</span><span>$1,280 ›</span></div>
+          </div>
+        </div>
+        <div class="cap"><b>① 商城 / 購物車</b><span>挑選商品加入購物車</span></div>
+      </div>
+
+      <!-- 2 結帳 -->
+      <div class="shot">
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="pbar"><div class="ptitle"><span class="back">‹</span>填寫訂購資料</div></div>
+          <div class="pbody">
+            <div class="ifield focus"><span class="lbl">姓名 <span class="req">*</span></span><div class="val">王小明</div></div>
+            <div class="ifield"><span class="lbl">手機號碼 <span class="req">*</span></span><div class="val">0912-345-789</div></div>
+            <div class="ifield"><span class="lbl">收件地址 <span class="req">*</span></span><div class="val">台北市信義區…</div></div>
+            <div class="ifield"><span class="lbl">LINE ID（選填）</span><div class="ph">未填寫</div></div>
+            <div class="mbtn"><svg class="icon"><use href="#i-check"/></svg>送出訂單</div>
+          </div>
+        </div>
+        <div class="cap"><b>② 結帳填寫</b><span>填基本訂購資料</span></div>
+      </div>
+
+      <!-- 3 訂單完成 -->
+      <div class="shot">
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="pbar"><div class="ptitle">訂單完成</div></div>
+          <div class="pbody">
+            <div class="succ"><div class="ck"><svg class="icon"><use href="#i-check"/></svg></div><div class="st">訂單建立成功！</div><div class="ss">請於 24 小時內完成轉帳</div></div>
+            <div class="sumcard">
+              <div class="srow"><span class="k">訂單編號</span><span class="v code">F202605300001</span></div>
+              <div class="srow"><span class="k">查詢碼</span><span class="v code">728391</span></div>
+              <div class="srow"><span class="k">轉帳帳號</span><span class="v">XXX-XXXX-XXXX</span></div>
+              <div class="srow total"><span class="k">應付金額</span><span class="v">$1,280</span></div>
+            </div>
+            <div class="mbtn"><svg class="icon"><use href="#i-card"/></svg>我已付款</div>
+            <div class="mbtn ghost"><svg class="icon"><use href="#i-search"/></svg>稍後查詢訂單</div>
+          </div>
+        </div>
+        <div class="cap"><b>③ 訂單完成頁</b><span>顯示查詢碼與轉帳資訊</span></div>
+      </div>
+
+      <!-- 4 付款回報 -->
+      <div class="shot">
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="pbar"><div class="ptitle"><span class="back">‹</span>回報付款</div></div>
+          <div class="pbody">
+            <div class="ifield focus"><span class="lbl">轉帳末五碼 <span class="req">*</span></span><div class="val mono">12345</div></div>
+            <div class="ifield"><span class="lbl">轉帳金額 <span class="req">*</span></span><div class="val">$1,280</div></div>
+            <div class="ifield"><span class="lbl">轉帳時間 <span class="req">*</span></span><div class="val">2026/05/30 15:32</div></div>
+            <div class="ifield"><span class="lbl">轉帳人姓名（選填）</span><div class="ph">未填寫</div></div>
+            <div class="mbtn"><svg class="icon"><use href="#i-clip"/></svg>送出回報</div>
+          </div>
+        </div>
+        <div class="cap"><b>④ 我已付款（回報）</b><span>填轉帳末五碼回報</span></div>
+      </div>
+
+      <!-- 5 訂單查詢 -->
+      <div class="shot">
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="pbar"><div class="ptitle"><svg class="icon"><use href="#i-search"/></svg>查詢我的訂單</div></div>
+          <div class="pbody">
+            <div class="ifield focus"><span class="lbl">手機號碼 <span class="req">*</span></span><div class="val">0912-345-789</div></div>
+            <div class="ifield"><span class="lbl">姓名 <span class="req">*</span></span><div class="val">王小明</div></div>
+            <div class="mbtn" style="margin-bottom:14px"><svg class="icon"><use href="#i-search"/></svg>查詢訂單</div>
+            <div class="listcap">名下相關訂單 · 共 2 筆</div>
+            <div class="olist">
+              <div class="orow">
+                <div class="oinfo"><div class="ono">F202605300001</div><div class="oamt">$1,280 · 05/30</div></div>
+                <span class="tg tg-ok"><svg class="icon"><use href="#i-truck"/></svg>已出貨</span>
+                <svg class="icon go"><use href="#i-chev"/></svg>
+              </div>
+              <div class="orow">
+                <div class="oinfo"><div class="ono">F202605280042</div><div class="oamt">$640 · 05/28</div></div>
+                <span class="tg tg-wait"><svg class="icon"><use href="#i-clock"/></svg>待付款</span>
+                <svg class="icon go"><use href="#i-chev"/></svg>
+              </div>
             </div>
           </div>
         </div>
+        <div class="cap"><b>⑤ 查詢我的訂單</b><span>手機 + 姓名查名下訂單</span></div>
       </div>
-      <div class="cap"><b>⑤ 查詢我的訂單</b><span>手機 + 姓名查名下訂單</span></div>
+
     </div>
 
-  </div>
-
-  <!-- 後台 -->
-  <p class="sub" style="margin:38px 0 0;">管理者後台（電腦版）— 收到通知後在此核帳與出貨：</p>
-  <div class="browser">
-    <div class="chrome">
-      <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
-      <div class="urlbar"><svg class="icon"><use href="#i-lock"/></svg>freshmart.com/admin/orders</div>
+    <!-- 後台 -->
+    <p class="sub" style="margin:42px 0 0;padding-left:0;">管理者後台（電腦版）— 收到通知後在此核帳與出貨：</p>
+    <div class="browser" style="margin-top:14px;">
+      <div class="chrome">
+        <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+        <div class="urlbar"><svg class="icon"><use href="#i-lock"/></svg>freshmart.com/admin/orders</div>
+      </div>
+      <div class="admin">
+        <aside class="side">
+          <div class="brand"><span class="logo"><svg class="icon"><use href="#i-store"/></svg></span>FreshMart</div>
+          <nav class="nav">
+            <a href="#"><svg class="icon"><use href="#i-grid"/></svg>總覽</a>
+            <a href="#" class="on"><svg class="icon"><use href="#i-list"/></svg>訂單管理</a>
+            <a href="#"><svg class="icon"><use href="#i-bag"/></svg>商品管理</a>
+            <a href="#"><svg class="icon"><use href="#i-bell"/></svg>付款回報</a>
+            <a href="#"><svg class="icon"><use href="#i-gear"/></svg>設定</a>
+          </nav>
+        </aside>
+        <main class="main">
+          <div class="mhead">
+            <h4>訂單管理</h4>
+            <span class="pill-sm"><svg class="icon"><use href="#i-clock"/></svg>即時更新</span>
+          </div>
+          <div class="stats">
+            <div class="stat s-hot"><div class="sl"><svg class="icon"><use href="#i-bell"/></svg>待核帳</div><div class="sv">3</div></div>
+            <div class="stat s-ship"><div class="sl"><svg class="icon"><use href="#i-truck"/></svg>待出貨</div><div class="sv">5</div></div>
+            <div class="stat s-rev"><div class="sl"><svg class="icon"><use href="#i-coin"/></svg>今日營收</div><div class="sv">$24.8k</div></div>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>訂單編號</th><th>客戶</th><th>金額</th><th>末五碼</th><th>狀態</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">F202605300001</td><td>王小明</td><td>$1,280</td><td class="mono">12345</td>
+                <td><span class="tg tg-rep"><svg class="icon"><use href="#i-clip"/></svg>已回報</span></td>
+                <td><span class="abtn primary"><svg class="icon"><use href="#i-check"/></svg>確認收款</span><span class="abtn ghost">取消</span></td>
+              </tr>
+              <tr>
+                <td class="mono">F202605300002</td><td>陳美麗</td><td>$960</td><td class="mono">88210</td>
+                <td><span class="tg tg-warn"><svg class="icon"><use href="#i-alert"/></svg>付款異常</span></td>
+                <td><span class="abtn primary"><svg class="icon"><use href="#i-check"/></svg>確認收款</span><span class="abtn ghost">取消</span></td>
+              </tr>
+              <tr>
+                <td class="mono">F202605300003</td><td>林大同</td><td>$2,150</td><td class="mono">—</td>
+                <td><span class="tg tg-wait"><svg class="icon"><use href="#i-clock"/></svg>待付款</span></td>
+                <td><span class="abtn ghost">取消</span></td>
+              </tr>
+              <tr>
+                <td class="mono">F202605290088</td><td>張雅婷</td><td>$1,280</td><td class="mono">54021</td>
+                <td><span class="tg tg-ok"><svg class="icon"><use href="#i-truck"/></svg>已出貨</span></td>
+                <td><span class="abtn ghost">查看</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </main>
+      </div>
     </div>
-    <div class="admin">
-      <aside class="side">
-        <div class="brand"><span class="logo"><svg class="icon"><use href="#i-store"/></svg></span>FreshMart</div>
-        <nav class="nav">
-          <a href="#"><svg class="icon"><use href="#i-grid"/></svg>總覽</a>
-          <a href="#" class="on"><svg class="icon"><use href="#i-list"/></svg>訂單管理</a>
-          <a href="#"><svg class="icon"><use href="#i-bag"/></svg>商品管理</a>
-          <a href="#"><svg class="icon"><use href="#i-bell"/></svg>付款回報</a>
-          <a href="#"><svg class="icon"><use href="#i-gear"/></svg>設定</a>
-        </nav>
-      </aside>
-      <main class="main">
-        <div class="mhead">
-          <h4>訂單管理</h4>
-          <span class="pill-sm"><svg class="icon"><use href="#i-clock"/></svg>即時更新</span>
-        </div>
-        <div class="stats">
-          <div class="stat hot"><div class="sl"><svg class="icon"><use href="#i-bell"/></svg>待核帳</div><div class="sv">3</div></div>
-          <div class="stat"><div class="sl"><svg class="icon"><use href="#i-truck"/></svg>待出貨</div><div class="sv">5</div></div>
-          <div class="stat"><div class="sl"><svg class="icon"><use href="#i-coin"/></svg>今日營收</div><div class="sv">$24.8k</div></div>
-        </div>
-        <table class="tbl">
-          <thead><tr><th>訂單編號</th><th>客戶</th><th>金額</th><th>末五碼</th><th>狀態</th><th>操作</th></tr></thead>
-          <tbody>
-            <tr>
-              <td class="mono">F202605300001</td><td>王小明</td><td>$1,280</td><td class="mono">12345</td>
-              <td><span class="tg tg-rep"><svg class="icon"><use href="#i-clip"/></svg>已回報</span></td>
-              <td><span class="btn-sm primary"><svg class="icon"><use href="#i-check"/></svg>確認收款</span><span class="btn-sm ghost">取消</span></td>
-            </tr>
-            <tr>
-              <td class="mono">F202605300002</td><td>陳美麗</td><td>$960</td><td class="mono">88210</td>
-              <td><span class="tg tg-warn"><svg class="icon"><use href="#i-alert"/></svg>付款異常</span></td>
-              <td><span class="btn-sm primary"><svg class="icon"><use href="#i-check"/></svg>確認收款</span><span class="btn-sm ghost">取消</span></td>
-            </tr>
-            <tr>
-              <td class="mono">F202605300003</td><td>林大同</td><td>$2,150</td><td class="mono">—</td>
-              <td><span class="tg tg-wait"><svg class="icon"><use href="#i-clock"/></svg>待付款</span></td>
-              <td><span class="btn-sm ghost">取消</span></td>
-            </tr>
-            <tr>
-              <td class="mono">F202605290088</td><td>張雅婷</td><td>$1,280</td><td class="mono">54021</td>
-              <td><span class="tg tg-ok"><svg class="icon"><use href="#i-truck"/></svg>已出貨</span></td>
-              <td><span class="btn-sm ghost">查看</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </main>
-    </div>
-  </div>
+  </section>
 
   <!-- 3. 狀態機 -->
-  <h2><span class="num">3</span>訂單狀態流程</h2>
-  <p class="sub">訂單在不同階段會處於以下狀態，含正常與異常兩種路徑。</p>
-  <p style="color:var(--ink-2);font-size:14px;margin:0 0 12px;font-weight:700;display:flex;align-items:center;gap:7px;"><svg class="icon" style="color:var(--ok);font-size:17px"><use href="#i-check"/></svg>正常流程</p>
-  <div class="states">
-    <span class="pill start">待付款</span>
-    <span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span>
-    <span class="pill">已回報付款</span>
-    <span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span>
-    <span class="pill">已確認收款</span>
-    <span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span>
-    <span class="pill">備貨中</span>
-    <span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span>
-    <span class="pill end">已出貨</span>
-  </div>
-  <p style="color:var(--ink-2);font-size:14px;margin:26px 0 12px;font-weight:700;display:flex;align-items:center;gap:7px;"><svg class="icon" style="color:var(--brand);font-size:17px"><use href="#i-alert"/></svg>異常 / 分支流程</p>
-  <div class="branch">
-    <div class="bx glass"><span class="pill start">待付款</span><span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span><span class="pill warn">已取消</span></div>
-    <div class="bx glass"><span class="pill">已回報付款</span><span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span><span class="pill warn">付款異常</span></div>
-    <div class="bx glass"><span class="pill warn">付款異常</span><span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span><span class="pill end">已確認</span><span class="sep">/</span><span class="pill warn">已取消</span></div>
-  </div>
+  <section>
+    <div class="shead"><span class="num">3</span><h2>訂單狀態流程</h2></div>
+    <p class="sub">訂單在不同階段會處於以下狀態，含正常與異常兩種路徑。</p>
+    <p style="color:var(--ink-2);font-size:15px;margin:0 0 14px;font-weight:800;display:flex;align-items:center;gap:8px;"><svg class="icon" style="color:var(--c-green);font-size:18px"><use href="#i-check"/></svg>正常流程</p>
+    <div class="states">
+      <span class="pill start">待付款</span>
+      <span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span>
+      <span class="pill">已回報付款</span>
+      <span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span>
+      <span class="pill">已確認收款</span>
+      <span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span>
+      <span class="pill">備貨中</span>
+      <span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span>
+      <span class="pill end">已出貨</span>
+    </div>
+    <p style="color:var(--ink-2);font-size:15px;margin:28px 0 14px;font-weight:800;display:flex;align-items:center;gap:8px;"><svg class="icon" style="color:var(--red);font-size:18px"><use href="#i-alert"/></svg>異常 / 分支流程</p>
+    <div class="branch">
+      <div class="card bx"><span class="pill start">待付款</span><span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span><span class="pill warn">已取消</span></div>
+      <div class="card bx"><span class="pill">已回報付款</span><span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span><span class="pill warn">付款異常</span></div>
+      <div class="card bx"><span class="pill warn">付款異常</span><span class="sep"><svg class="icon"><use href="#i-arrow"/></svg></span><span class="pill end">已確認</span><span class="sep">/</span><span class="pill warn">已取消</span></div>
+    </div>
+  </section>
 
   <!-- 4. 兩種入口 -->
-  <h2><span class="num">4</span>付款回報的兩種入口</h2>
-  <p class="sub">顧客完成轉帳後，可透過兩種方式回到網站回報付款。</p>
-  <div class="cards">
-    <div class="ccard glass entry">
-      <span class="way">方式一</span>
-      <div class="ic-top"><svg class="icon"><use href="#i-card"/></svg></div>
-      <h3>訂單完成頁「我已付款」</h3>
-      <ul>
-        <li><svg class="icon"><use href="#i-check"/></svg>下單成功後完成頁直接顯示連結</li>
-        <li><svg class="icon"><use href="#i-check"/></svg>連結可帶入訂單資訊，免再輸入</li>
-        <li><svg class="icon"><use href="#i-check"/></svg><code>/payment-report?orderNo=…&amp;code=…</code></li>
-      </ul>
+  <section>
+    <div class="shead"><span class="num">4</span><h2>付款回報的兩種入口</h2></div>
+    <p class="sub">顧客完成轉帳後，可透過兩種方式回到網站回報付款。</p>
+    <div class="cards">
+      <div class="card hoverable ccard entry">
+        <span class="way">方式一</span>
+        <div class="blob orange"><svg class="icon"><use href="#i-card"/></svg></div>
+        <h3>訂單完成頁「我已付款」</h3>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>下單成功後完成頁直接顯示連結</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>連結可帶入訂單資訊，免再輸入</li>
+          <li><svg class="icon"><use href="#i-check"/></svg><code>/payment-report?orderNo=…&amp;code=…</code></li>
+        </ul>
+      </div>
+      <div class="card hoverable ccard entry">
+        <span class="way">方式二</span>
+        <div class="blob blue"><svg class="icon"><use href="#i-search"/></svg></div>
+        <h3>手機號碼 + 姓名</h3>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>適用已離開完成頁的情況（不需查詢碼）</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>從「訂單查詢」列出名下所有訂單</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>選擇訂單後再點「我已付款」回報</li>
+        </ul>
+      </div>
     </div>
-    <div class="ccard glass entry">
-      <span class="way">方式二</span>
-      <div class="ic-top"><svg class="icon"><use href="#i-search"/></svg></div>
-      <h3>手機號碼 + 姓名</h3>
-      <ul>
-        <li><svg class="icon"><use href="#i-check"/></svg>適用已離開完成頁的情況（不需查詢碼）</li>
-        <li><svg class="icon"><use href="#i-check"/></svg>從「訂單查詢」列出名下所有訂單</li>
-        <li><svg class="icon"><use href="#i-check"/></svg>選擇訂單後再點「我已付款」回報</li>
-      </ul>
-    </div>
-  </div>
+  </section>
 
   <!-- 5. 通知範例 -->
-  <h2><span class="num">5</span>付款回報通知範例</h2>
-  <p class="sub">顧客送出回報後，管理者會立即收到 Telegram（或 Email）通知。</p>
-  <div class="notes">
-    <div class="note">
-      <div class="nh"><span class="ava"><svg class="icon"><use href="#i-coin"/></svg></span>一般付款回報</div>
-      <div class="nb">訂單編號：F202605300001
+  <section>
+    <div class="shead"><span class="num">5</span><h2>付款回報通知範例</h2></div>
+    <p class="sub">顧客送出回報後，管理者會立即收到 Telegram（或 Email）通知。</p>
+    <div class="notes">
+      <div class="note">
+        <div class="nh"><span class="ava"><svg class="icon"><use href="#i-coin"/></svg></span>一般付款回報</div>
+        <div class="nb">訂單編號：F202605300001
 客戶姓名：王小明
 手機號碼：0912***789
 
@@ -761,10 +734,10 @@
 
 目前狀態：已回報付款，待核帳
 後台查看：/admin/orders/F202605300001</div>
-    </div>
-    <div class="note alert">
-      <div class="nh"><span class="ava" style="background:none;border:1px solid rgba(255,118,118,.4)"><svg class="icon" style="color:#ff7676"><use href="#i-alert"/></svg></span>付款金額異常</div>
-      <div class="nb">訂單編號：F202605300002
+      </div>
+      <div class="note alert">
+        <div class="nh"><span class="ava"><svg class="icon"><use href="#i-alert"/></svg></span>付款金額異常</div>
+        <div class="nb">訂單編號：F202605300002
 客戶姓名：陳美麗
 
 訂單金額：$960
@@ -773,66 +746,63 @@
 
 請於後台人工核對後決定
 「確認收款」或「取消訂單」。</div>
+      </div>
     </div>
-  </div>
+  </section>
 
   <!-- 6. MVP -->
-  <h2><span class="num">6</span>第一版功能範圍（MVP）</h2>
-  <p class="sub">第一版聚焦完成核心下單閉環，黑名單等進階防濫用列為第二階段。</p>
-  <div class="cards">
-    <div class="ccard glass">
-      <div class="ic-top"><svg class="icon"><use href="#i-store"/></svg></div>
-      <h3>前台</h3>
-      <ul>
-        <li><svg class="icon"><use href="#i-chev"/></svg>商品列表 / 詳情</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>購物車</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>建立訂單 / 訂單完成頁</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>我已付款頁</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>訂單查詢頁</li>
-      </ul>
+  <section>
+    <div class="shead"><span class="num">6</span><h2>第一版功能範圍（MVP）</h2></div>
+    <p class="sub">第一版聚焦完成核心下單閉環，黑名單等進階防濫用列為第二階段。</p>
+    <div class="cards">
+      <div class="card hoverable ccard">
+        <div class="blob red"><svg class="icon"><use href="#i-store"/></svg></div>
+        <h3>前台</h3>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>商品列表 / 詳情</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>購物車</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>建立訂單 / 訂單完成頁</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>我已付款頁</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>訂單查詢頁</li>
+        </ul>
+      </div>
+      <div class="card hoverable ccard">
+        <div class="blob orange"><svg class="icon"><use href="#i-gear"/></svg></div>
+        <h3>後台</h3>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>商品管理</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>訂單列表 / 詳情</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>付款回報查看</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>確認收款 / 取消訂單</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>更新出貨狀態</li>
+        </ul>
+      </div>
+      <div class="card hoverable ccard">
+        <div class="blob violet"><svg class="icon"><use href="#i-bell"/></svg></div>
+        <h3>通知</h3>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>Telegram 付款回報通知</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Email 備援通知</li>
+        </ul>
+      </div>
+      <div class="card hoverable ccard">
+        <div class="blob teal"><svg class="icon"><use href="#i-shield"/></svg></div>
+        <h3>防濫用</h3>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>Cloudflare Turnstile</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>同 IP 下單限制</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>同手機未付款訂單限制</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>同訂單回報次數限制</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>黑名單 <span class="opt">（第二階段）</span></li>
+        </ul>
+      </div>
     </div>
-    <div class="ccard glass">
-      <div class="ic-top"><svg class="icon"><use href="#i-gear"/></svg></div>
-      <h3>後台</h3>
-      <ul>
-        <li><svg class="icon"><use href="#i-chev"/></svg>商品管理</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>訂單列表 / 詳情</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>付款回報查看</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>確認收款 / 取消訂單</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>更新出貨狀態</li>
-      </ul>
-    </div>
-    <div class="ccard glass">
-      <div class="ic-top"><svg class="icon"><use href="#i-bell"/></svg></div>
-      <h3>通知</h3>
-      <ul>
-        <li><svg class="icon"><use href="#i-chev"/></svg>Telegram 付款回報通知</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>Email 備援通知</li>
-      </ul>
-    </div>
-    <div class="ccard glass">
-      <div class="ic-top"><svg class="icon"><use href="#i-shield"/></svg></div>
-      <h3>防濫用</h3>
-      <ul>
-        <li><svg class="icon"><use href="#i-chev"/></svg>Cloudflare Turnstile</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>同 IP 下單限制</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>同手機未付款訂單限制</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>同訂單回報次數限制</li>
-        <li><svg class="icon"><use href="#i-chev"/></svg>黑名單 <span class="opt">（第二階段）</span></li>
-      </ul>
-    </div>
-  </div>
+  </section>
 
 </div>
 
 <footer>
-  <div class="fline">
-    <span>FreshMart 簡易下單系統 · 流程說明 v0.3</span>
-    <span>·</span>
-    <span>2026-05-30</span>
-    <span>·</span>
-    <span>詳細需求請見 <code>docs/order-system-spec.md</code></span>
-  </div>
+  FreshMart 簡易下單系統 · 流程說明 v0.4 · 2026-05-30 · 詳細需求請見 <code>docs/order-system-spec.md</code>
 </footer>
 
 </body>
