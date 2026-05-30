@@ -6,21 +6,29 @@
 <title>FreshMart 簡易下單系統 — 流程說明</title>
 <style>
   :root {
-    --bg: #f6f8fa;
+    /* 主色系：以紅色 #FF2D2D 為品牌主色，搭配中性色與少量功能色 */
+    --brand: #FF2D2D;
+    --brand-600: #e62020;
+    --brand-700: #c41818;
+    --brand-50: #fff1f1;
+    --brand-100: #ffdede;
+
+    --bg: #fbfafa;
     --card: #ffffff;
-    --ink: #1f2933;
-    --muted: #6b7280;
-    --line: #e2e8f0;
-    --brand: #2f9e44;
-    --brand-soft: #e6f4ea;
-    --user: #1c7ed6;
-    --user-soft: #e7f1fb;
-    --admin: #e8590c;
-    --admin-soft: #fdf0e6;
-    --sys: #7048e8;
-    --sys-soft: #efeafd;
-    --warn: #e03131;
-    --warn-soft: #fce8e8;
+    --ink: #21262d;
+    --ink-soft: #3a4250;
+    --muted: #707883;
+    --line: #ece8e8;
+
+    /* 角色色（功能性，用來區分誰在操作） */
+    --user: #1c6ed6;   --user-soft: #e8f1fc;
+    --sys:  #6d49d6;   --sys-soft:  #eee9fb;
+    --admin:#e8590c;   --admin-soft:#fdf0e6;
+
+    /* 狀態色 */
+    --ok: #2f9e44;     --ok-soft: #e7f5ea;
+    --wait: #d9480f;   --wait-soft: #fff3e6;
+    --info: #0c8599;   --info-soft: #e2f7fa;
   }
   * { box-sizing: border-box; }
   body {
@@ -28,162 +36,473 @@
     font-family: "Segoe UI", "Microsoft JhengHei", system-ui, sans-serif;
     background: var(--bg);
     color: var(--ink);
-    line-height: 1.6;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
   }
+
+  /* ── Header ── */
   header {
-    background: linear-gradient(135deg, #2f9e44, #1c7ed6);
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-700) 100%);
     color: #fff;
-    padding: 40px 24px;
+    padding: 52px 24px 56px;
     text-align: center;
-  }
-  header h1 { margin: 0 0 8px; font-size: 28px; }
-  header p { margin: 0; opacity: .92; max-width: 720px; margin-inline: auto; }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
-
-  h2 {
-    font-size: 20px;
-    margin: 40px 0 16px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--line);
-  }
-
-  /* 角色圖例 */
-  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
-  .legend .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 12px; border-radius: 999px; font-weight: 600; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .t-user { background: var(--user-soft); color: var(--user); }
-  .t-user .dot { background: var(--user); }
-  .t-sys { background: var(--sys-soft); color: var(--sys); }
-  .t-sys .dot { background: var(--sys); }
-  .t-admin { background: var(--admin-soft); color: var(--admin); }
-  .t-admin .dot { background: var(--admin); }
-
-  /* 流程步驟 */
-  .flow { display: flex; flex-direction: column; gap: 0; }
-  .step {
     position: relative;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-left: 5px solid var(--line);
-    border-radius: 10px;
-    padding: 16px 18px;
-    margin: 0 0 8px;
+    overflow: hidden;
+  }
+  header::after {
+    content: ""; position: absolute; inset: auto -10% -60% -10%; height: 200px;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.18), transparent 70%);
+  }
+  header .badge {
+    display: inline-block; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+    padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: .5px; margin-bottom: 14px;
+  }
+  header h1 { margin: 0 0 12px; font-size: 32px; letter-spacing: -.5px; }
+  header p { margin: 0 auto; opacity: .95; max-width: 680px; font-size: 15px; }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 8px 24px 72px; }
+
+  /* ── Section title ── */
+  h2 {
+    font-size: 22px; margin: 56px 0 8px; display: flex; align-items: center; gap: 10px;
+  }
+  h2 .num {
+    display: inline-grid; place-items: center; width: 30px; height: 30px; flex: none;
+    background: var(--brand); color: #fff; border-radius: 9px; font-size: 15px; font-weight: 800;
+  }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 20px; padding-left: 40px; }
+
+  /* ── 三步驟大圖 ── */
+  .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 28px 0 8px; }
+  .ov { position: relative; text-align: center; padding: 22px 14px; background: var(--card); border: 1px solid var(--line); }
+  .ov:first-child { border-radius: 14px 0 0 14px; }
+  .ov:last-child { border-radius: 0 14px 14px 0; }
+  .ov + .ov { border-left: none; }
+  .ov .ico { font-size: 30px; }
+  .ov .h { font-weight: 800; font-size: 15px; margin: 8px 0 4px; }
+  .ov .t { font-size: 13px; color: var(--muted); }
+  .ov:not(:last-child)::after {
+    content: "→"; position: absolute; right: -11px; top: 50%; transform: translateY(-50%);
+    z-index: 2; background: var(--brand); color: #fff; width: 22px; height: 22px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 13px; font-weight: 700;
+  }
+
+  /* ── 角色圖例 ── */
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 4px; }
+  .legend .tag { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; padding: 5px 14px; border-radius: 999px; font-weight: 700; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .t-user { background: var(--user-soft); color: var(--user); } .t-user .dot { background: var(--user); }
+  .t-sys  { background: var(--sys-soft);  color: var(--sys); }  .t-sys .dot  { background: var(--sys); }
+  .t-admin{ background: var(--admin-soft); color: var(--admin); }.t-admin .dot{ background: var(--admin); }
+
+  /* ── 流程步驟 ── */
+  .flow { display: flex; flex-direction: column; gap: 0; margin-top: 8px; }
+  .step {
+    position: relative; background: var(--card); border: 1px solid var(--line);
+    border-left: 4px solid var(--line); border-radius: 12px; padding: 16px 20px; margin: 0 0 10px;
+    display: flex; gap: 16px; align-items: flex-start;
   }
   .step.user { border-left-color: var(--user); }
-  .step.sys { border-left-color: var(--sys); }
-  .step.admin { border-left-color: var(--admin); }
-  .step .role { font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+  .step.sys  { border-left-color: var(--sys); }
+  .step.admin{ border-left-color: var(--admin); }
+  .step .n {
+    flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+    font-weight: 800; font-size: 14px; color: #fff; background: var(--ink);
+  }
+  .step.user .n { background: var(--user); }
+  .step.sys  .n { background: var(--sys); }
+  .step.admin .n { background: var(--admin); }
+  .step .body { flex: 1; min-width: 0; }
+  .step .role { font-size: 11px; font-weight: 800; letter-spacing: .6px; }
   .step.user .role { color: var(--user); }
-  .step.sys .role { color: var(--sys); }
+  .step.sys  .role { color: var(--sys); }
   .step.admin .role { color: var(--admin); }
-  .step .title { font-weight: 700; font-size: 16px; margin: 2px 0 4px; }
-  .step .desc { color: var(--muted); font-size: 14px; }
-  .arrow { text-align: center; color: var(--muted); font-size: 18px; margin: 2px 0 8px; }
+  .step .title { font-weight: 800; font-size: 16px; margin: 1px 0 4px; }
+  .step .desc { color: var(--ink-soft); font-size: 14px; }
+  .arrow { text-align: center; color: #c7cdd4; font-size: 16px; margin: -2px 0 8px; }
 
-  /* 狀態徽章 */
-  .status { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 6px; margin-top: 8px; }
-  .s-wait { background: #fff4e6; color: #d9480f; }
+  /* ── 狀態徽章（流程內 / 通用） ── */
+  .status { display: inline-block; font-size: 12px; font-weight: 800; padding: 3px 11px; border-radius: 7px; margin-top: 10px; }
+  .s-wait { background: var(--wait-soft); color: var(--wait); }
   .s-reported { background: var(--sys-soft); color: var(--sys); }
-  .s-confirmed { background: var(--brand-soft); color: var(--brand); }
-  .s-shipped { background: #e3fafc; color: #0c8599; }
+  .s-confirmed { background: var(--ok-soft); color: var(--ok); }
+  .s-shipped { background: var(--info-soft); color: var(--info); }
 
-  /* 狀態機 */
+  /* ── 畫面示意（手機框） ── */
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(232px, 1fr)); gap: 26px; margin-top: 8px; }
+  .shot { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .shot .cap { font-size: 13px; font-weight: 700; color: var(--ink); text-align: center; }
+  .shot .cap span { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+  .phone {
+    width: 100%; max-width: 252px; background: #fff; border: 1px solid var(--line); border-radius: 22px;
+    box-shadow: 0 14px 34px rgba(40,20,20,.10); overflow: hidden;
+  }
+  .phone .appbar {
+    background: var(--brand); color: #fff; font-size: 13px; font-weight: 800; padding: 13px 16px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .phone .appbar .back { opacity: .85; font-weight: 600; }
+  .pbody { padding: 14px; font-size: 12px; }
+
+  /* mockup atoms */
+  .m-field { background: #f6f4f4; border: 1px solid var(--line); border-radius: 9px; padding: 7px 10px; margin-bottom: 8px; }
+  .m-field .lbl { font-size: 10px; color: var(--muted); display: block; }
+  .m-field .val { font-size: 12px; color: var(--ink); font-weight: 600; }
+  .m-field .ph  { font-size: 12px; color: #b6bcc4; }
+  .req { color: var(--brand); font-weight: 800; }
+  .m-btn { background: var(--brand); color: #fff; text-align: center; padding: 10px; border-radius: 9px; font-weight: 800; font-size: 12.5px; margin-top: 4px; }
+  .m-btn.ghost { background: #fff; color: var(--brand); border: 1.5px solid var(--brand-100); }
+  .m-link { text-align: center; color: var(--muted); font-size: 11.5px; margin-top: 9px; text-decoration: underline; }
+  .m-prod { display: flex; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+  .m-thumb { width: 44px; height: 44px; border-radius: 9px; background: linear-gradient(135deg,#ffd9d9,#fff0f0); flex: none; display: grid; place-items: center; font-size: 20px; }
+  .m-prod .info { flex: 1; }
+  .m-prod .pn { font-weight: 700; font-size: 12px; }
+  .m-prod .pp { color: var(--brand); font-weight: 800; font-size: 12px; }
+  .m-add { font-size: 16px; color: #fff; background: var(--brand); width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; flex: none; }
+  .m-cartbar { background: var(--brand-50); border: 1px solid var(--brand-100); border-radius: 10px; padding: 9px 11px; display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .m-cartbar .c { font-size: 11.5px; } .m-cartbar .c b { color: var(--brand); }
+  .m-cartbar .go { background: var(--brand); color: #fff; padding: 5px 11px; border-radius: 7px; font-size: 11.5px; font-weight: 800; }
+  .m-success { text-align: center; padding: 6px 0 2px; }
+  .m-check { width: 50px; height: 50px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; font-size: 26px; margin: 0 auto 8px; }
+  .m-box { background: #faf8f8; border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
+  .m-box .row { display: flex; justify-content: space-between; font-size: 11.5px; padding: 2px 0; }
+  .m-box .row .k { color: var(--muted); }
+  .m-box .row .v { font-weight: 700; }
+  .m-box .row .v.hi { color: var(--brand); font-family: ui-monospace, Consolas, monospace; letter-spacing: .5px; }
+
+  /* 查詢結果時間軸 */
+  .m-tl { margin: 4px 0; }
+  .m-tl .tli { display: flex; gap: 9px; align-items: flex-start; }
+  .m-tl .tli .col { display: flex; flex-direction: column; align-items: center; }
+  .m-tl .tli .d { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); background: #fff; flex: none; margin-top: 1px; }
+  .m-tl .tli.done .d { background: var(--ok); border-color: var(--ok); }
+  .m-tl .tli.now .d { background: var(--brand); border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-100); }
+  .m-tl .tli .ln { width: 2px; flex: 1; min-height: 14px; background: var(--line); }
+  .m-tl .tli.done .ln { background: var(--ok); }
+  .m-tl .tli .lbl2 { font-size: 11.5px; padding-bottom: 9px; }
+  .m-tl .tli .lbl2 b { font-weight: 700; }
+  .m-tl .tli .lbl2 small { color: var(--muted); display: block; font-size: 10.5px; }
+
+  /* ── 後台桌面框 ── */
+  .browser { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 14px 34px rgba(40,20,20,.10); background: #fff; margin-top: 8px; }
+  .browser .chrome { background: #f3efef; padding: 11px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); }
+  .browser .chrome .dots { display: flex; gap: 6px; }
+  .browser .chrome .dots i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+  .browser .chrome .url { background: #fff; border: 1px solid var(--line); border-radius: 7px; padding: 5px 12px; font-size: 12px; color: var(--muted); flex: 1; }
+  .browser .win { padding: 18px 20px; }
+  .browser .win .wt { font-weight: 800; font-size: 15px; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+  .browser .win .wt .pin { background: var(--brand); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 6px; }
+  table.m { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.m th { text-align: left; background: #faf7f7; color: var(--muted); font-weight: 700; padding: 9px 10px; border-bottom: 2px solid var(--line); white-space: nowrap; }
+  table.m td { padding: 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  table.m td.mono { font-family: ui-monospace, Consolas, monospace; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 6px; }
+  .b-wait { background: var(--wait-soft); color: var(--wait); }
+  .b-reported { background: var(--sys-soft); color: var(--sys); }
+  .b-ok { background: var(--ok-soft); color: var(--ok); }
+  .b-warn { background: var(--brand-50); color: var(--brand); }
+  .act { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 6px; margin-right: 4px; }
+  .act.primary { background: var(--brand); color: #fff; }
+  .act.ghost { background: #fff; color: var(--muted); border: 1px solid var(--line); }
+
+  /* ── 狀態機 ── */
   .states { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .pill { font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; }
-  .pill.warn { background: var(--warn-soft); color: var(--warn); border-color: #f5c2c2; }
-  .sep { color: var(--muted); }
+  .pill { font-size: 13px; font-weight: 700; padding: 7px 15px; border-radius: 999px; border: 1px solid var(--line); background: #fff; }
+  .pill.start { background: var(--wait-soft); color: var(--wait); border-color: #f6d6bf; }
+  .pill.end { background: var(--ok-soft); color: var(--ok); border-color: #b9e3c2; }
+  .pill.warn { background: var(--brand-50); color: var(--brand); border-color: var(--brand-100); }
+  .sep { color: #c7cdd4; font-weight: 700; }
+  .branch { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 4px; }
+  .branch .bx { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-  /* 卡片群 */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-  .ccard { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
-  .ccard h3 { margin: 0 0 10px; font-size: 15px; }
-  .ccard ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
-  .ccard li { margin: 3px 0; }
+  /* ── 卡片群 ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 8px; }
+  .ccard { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .ccard h3 { margin: 0 0 12px; font-size: 15px; display: flex; align-items: center; gap: 7px; }
+  .ccard ul { margin: 0; padding-left: 18px; color: var(--ink-soft); font-size: 13.5px; }
+  .ccard li { margin: 4px 0; }
+  .ccard li .opt { color: var(--muted); font-size: 12px; }
 
-  /* 範例 box */
-  .example { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 16px 18px; font-family: ui-monospace, "Consolas", monospace; font-size: 13px; white-space: pre-wrap; margin: 12px 0; }
+  /* ── 兩種入口 ── */
+  .entry { position: relative; }
+  .entry .way { position: absolute; top: 14px; right: 16px; background: var(--brand-50); color: var(--brand); font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 6px; }
 
-  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 24px; }
+  /* ── 通知範例 ── */
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .note { background: #0f172a; color: #e2e8f0; border-radius: 12px; padding: 0; overflow: hidden; }
+  .note .nh { background: rgba(255,255,255,.06); padding: 10px 16px; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .note .nb { padding: 14px 16px; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; white-space: pre-wrap; }
+  .note.alert .nh { background: rgba(255,45,45,.16); color: #ffb3b3; }
+  .note .em { color: #ff8a8a; font-weight: 700; }
+
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 32px 24px 40px; border-top: 1px solid var(--line); margin-top: 40px; }
+  footer code { background: #f1eeee; padding: 1px 6px; border-radius: 5px; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: .92em; }
+
+  @media (max-width: 640px) {
+    .overview { grid-template-columns: 1fr 1fr; }
+    .ov:nth-child(2) { border-radius: 0 14px 0 0; }
+    .ov:nth-child(3) { border-radius: 0 0 0 14px; border-left: 1px solid var(--line); }
+    .ov:nth-child(4) { border-radius: 0 0 14px 0; }
+    .ov:nth-child(2)::after { display: none; }
+    h2 { font-size: 19px; }
+  }
 </style>
 </head>
 <body>
 
 <header>
+  <span class="badge">流程說明 · 給需求者閱讀</span>
   <h1>🛒 FreshMart 簡易下單系統</h1>
-  <p>無會員、無金流，以「手機號碼 + 查詢碼 + 轉帳末五碼」完成訂單確認的下單網站。下單 → 轉帳回報 → 管理者核帳 → 出貨 → 查詢進度。</p>
+  <p>無會員、無金流的下單網站。顧客以「手機號碼 + 查詢碼 + 轉帳末五碼」完成訂單與付款回報，管理者核帳後出貨，全程可線上查詢進度。</p>
 </header>
 
 <div class="wrap">
 
+  <!-- 一眼看懂 -->
+  <h2><span class="num">0</span>一眼看懂整個系統</h2>
+  <p class="sub">四個關鍵環節，從顧客下單到收貨查詢形成完整閉環。</p>
+  <div class="overview">
+    <div class="ov"><div class="ico">🛍️</div><div class="h">顧客下單</div><div class="t">挑商品、填資料，取得訂單編號與查詢碼</div></div>
+    <div class="ov"><div class="ico">💸</div><div class="h">轉帳回報</div><div class="t">自行轉帳後，回網站填寫末五碼回報</div></div>
+    <div class="ov"><div class="ico">✅</div><div class="h">核帳出貨</div><div class="t">管理者收到通知、確認入帳後安排出貨</div></div>
+    <div class="ov"><div class="ico">🔎</div><div class="h">查詢進度</div><div class="t">顧客用手機 + 查詢碼查看付款與物流</div></div>
+  </div>
+
   <div class="legend">
-    <span class="tag t-user"><span class="dot"></span>使用者操作</span>
+    <span class="tag t-user"><span class="dot"></span>顧客操作</span>
     <span class="tag t-sys"><span class="dot"></span>系統自動</span>
     <span class="tag t-admin"><span class="dot"></span>管理者操作</span>
   </div>
 
   <!-- 主流程 -->
-  <h2>整體流程閉環</h2>
+  <h2><span class="num">1</span>完整流程（七步閉環）</h2>
+  <p class="sub">下方標示每一步「由誰操作」，以及操作後訂單會進入什麼狀態。</p>
   <div class="flow">
 
     <div class="step user">
-      <div class="role">使用者</div>
-      <div class="title">1. 瀏覽商品並下單</div>
-      <div class="desc">瀏覽商品、加入購物車，結帳時填寫姓名、手機號碼、收件地址（LINE ID / 備註可選）。</div>
+      <div class="n">1</div>
+      <div class="body">
+        <div class="role">顧客</div>
+        <div class="title">瀏覽商品並下單</div>
+        <div class="desc">瀏覽商品、加入購物車，結帳時填寫姓名、手機號碼、收件地址（LINE ID／備註可選）。</div>
+      </div>
     </div>
     <div class="arrow">↓</div>
 
     <div class="step sys">
-      <div class="role">系統</div>
-      <div class="title">2. 建立訂單，產生編號與查詢碼</div>
-      <div class="desc">產生訂單編號、查詢碼與付款資訊（金額、銀行、帳號）。</div>
-      <span class="status s-wait">待付款</span>
+      <div class="n">2</div>
+      <div class="body">
+        <div class="role">系統</div>
+        <div class="title">建立訂單，產生編號與查詢碼</div>
+        <div class="desc">自動產生訂單編號、查詢碼與付款資訊（金額、銀行、帳號），顯示於訂單完成頁。</div>
+        <span class="status s-wait">狀態：待付款</span>
+      </div>
     </div>
     <div class="arrow">↓</div>
 
     <div class="step user">
-      <div class="role">使用者</div>
-      <div class="title">3. 自行轉帳並回報付款</div>
-      <div class="desc">完成轉帳後，從「我已付款」連結或用「手機 + 查詢碼」進入回報頁，填寫轉帳末五碼、金額、時間。</div>
-      <span class="status s-reported">已回報付款</span>
+      <div class="n">3</div>
+      <div class="body">
+        <div class="role">顧客</div>
+        <div class="title">自行轉帳並回報付款</div>
+        <div class="desc">完成轉帳後，從「我已付款」連結，或用「手機 + 查詢碼」進入回報頁，填寫轉帳末五碼、金額、時間。</div>
+        <span class="status s-reported">狀態：已回報付款</span>
+      </div>
     </div>
     <div class="arrow">↓</div>
 
     <div class="step sys">
-      <div class="role">系統</div>
-      <div class="title">4. 即時通知管理者</div>
-      <div class="desc">透過 Telegram Bot 通知（Email 備援），含訂單與回報明細。金額不符會特別標示異常。</div>
+      <div class="n">4</div>
+      <div class="body">
+        <div class="role">系統</div>
+        <div class="title">即時通知管理者</div>
+        <div class="desc">透過 Telegram Bot 通知（Email 備援），內含訂單與回報明細；回報金額與訂單金額不符時會特別標示異常。</div>
+      </div>
     </div>
     <div class="arrow">↓</div>
 
     <div class="step admin">
-      <div class="role">管理者</div>
-      <div class="title">5. 後台核帳</div>
-      <div class="desc">核對銀行入帳資料，可操作「確認收款」「付款異常」或「取消訂單」。</div>
-      <span class="status s-confirmed">已確認收款</span>
+      <div class="n">5</div>
+      <div class="body">
+        <div class="role">管理者</div>
+        <div class="title">後台核帳</div>
+        <div class="desc">核對銀行入帳資料，可操作「確認收款」「付款異常」或「取消訂單」。</div>
+        <span class="status s-confirmed">狀態：已確認收款</span>
+      </div>
     </div>
     <div class="arrow">↓</div>
 
     <div class="step admin">
-      <div class="role">管理者</div>
-      <div class="title">6. 備貨、出貨並更新狀態</div>
-      <div class="desc">出貨後在後台更新出貨狀態、出貨時間、物流方式（物流單號 / 備註可選）。</div>
-      <span class="status s-shipped">已出貨</span>
+      <div class="n">6</div>
+      <div class="body">
+        <div class="role">管理者</div>
+        <div class="title">備貨、出貨並更新狀態</div>
+        <div class="desc">出貨後在後台更新出貨狀態、出貨時間、物流方式（物流單號／備註可選）。</div>
+        <span class="status s-shipped">狀態：已出貨</span>
+      </div>
     </div>
     <div class="arrow">↓</div>
 
     <div class="step user">
-      <div class="role">使用者</div>
-      <div class="title">7. 查詢訂單進度</div>
-      <div class="desc">用手機號碼 + 查詢碼查詢付款狀態、出貨狀態、物流資訊與更新時間。</div>
+      <div class="n">7</div>
+      <div class="body">
+        <div class="role">顧客</div>
+        <div class="title">查詢訂單進度</div>
+        <div class="desc">用手機號碼 + 查詢碼查詢付款狀態、出貨狀態、物流資訊與更新時間。</div>
+      </div>
     </div>
 
   </div>
 
+  <!-- 畫面示意 -->
+  <h2><span class="num">2</span>關鍵畫面示意</h2>
+  <p class="sub">以下為示意稿（非最終設計），用來幫助理解每一步顧客／管理者實際會看到的畫面。</p>
+
+  <div class="shots">
+
+    <!-- 1. 商品 + 購物車 -->
+    <div class="shot">
+      <div class="phone">
+        <div class="appbar">🛒 FreshMart</div>
+        <div class="pbody">
+          <div class="m-prod">
+            <div class="m-thumb">🥬</div>
+            <div class="info"><div class="pn">有機蔬菜箱</div><div class="pp">$680</div></div>
+            <div class="m-add">＋</div>
+          </div>
+          <div class="m-prod">
+            <div class="m-thumb">🍎</div>
+            <div class="info"><div class="pn">當季水果組</div><div class="pp">$600</div></div>
+            <div class="m-add">＋</div>
+          </div>
+          <div class="m-cartbar">
+            <div class="c">購物車 <b>2</b> 件 · <b>$1,280</b></div>
+            <div class="go">前往結帳 ›</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">① 商品列表 / 購物車<span>挑選商品加入購物車</span></div>
+    </div>
+
+    <!-- 2. 結帳 -->
+    <div class="shot">
+      <div class="phone">
+        <div class="appbar"><span class="back">‹</span> 填寫訂購資料</div>
+        <div class="pbody">
+          <div class="m-field"><span class="lbl">姓名 <span class="req">*</span></span><span class="val">王小明</span></div>
+          <div class="m-field"><span class="lbl">手機號碼 <span class="req">*</span></span><span class="val">0912-345-789</span></div>
+          <div class="m-field"><span class="lbl">收件地址 <span class="req">*</span></span><span class="val">台北市…</span></div>
+          <div class="m-field"><span class="lbl">LINE ID（選填）</span><span class="ph">未填寫</span></div>
+          <div class="m-btn">送出訂單</div>
+        </div>
+      </div>
+      <div class="cap">② 結帳填寫<span>填基本訂購資料</span></div>
+    </div>
+
+    <!-- 3. 訂單完成 -->
+    <div class="shot">
+      <div class="phone">
+        <div class="appbar">訂單完成</div>
+        <div class="pbody">
+          <div class="m-success">
+            <div class="m-check">✓</div>
+            <div style="font-weight:800;font-size:13px;">訂單建立成功</div>
+          </div>
+          <div class="m-box">
+            <div class="row"><span class="k">訂單編號</span><span class="v hi">F202605300001</span></div>
+            <div class="row"><span class="k">查詢碼</span><span class="v hi">728391</span></div>
+            <div class="row"><span class="k">應付金額</span><span class="v">$1,280</span></div>
+            <div class="row"><span class="k">轉帳帳號</span><span class="v">XXX-XXXX</span></div>
+          </div>
+          <div class="m-btn">我已付款</div>
+          <div class="m-link">稍後再查詢訂單</div>
+        </div>
+      </div>
+      <div class="cap">③ 訂單完成頁<span>顯示查詢碼與轉帳資訊</span></div>
+    </div>
+
+    <!-- 4. 付款回報 -->
+    <div class="shot">
+      <div class="phone">
+        <div class="appbar"><span class="back">‹</span> 回報付款</div>
+        <div class="pbody">
+          <div class="m-field"><span class="lbl">轉帳末五碼 <span class="req">*</span></span><span class="val" style="font-family:ui-monospace,Consolas,monospace;letter-spacing:2px;">12345</span></div>
+          <div class="m-field"><span class="lbl">轉帳金額 <span class="req">*</span></span><span class="val">$1,280</span></div>
+          <div class="m-field"><span class="lbl">轉帳時間 <span class="req">*</span></span><span class="val">05/30 15:32</span></div>
+          <div class="m-field"><span class="lbl">轉帳人姓名（選填）</span><span class="ph">未填寫</span></div>
+          <div class="m-btn">送出回報</div>
+        </div>
+      </div>
+      <div class="cap">④ 我已付款（回報）<span>填轉帳末五碼回報</span></div>
+    </div>
+
+    <!-- 5. 訂單查詢結果 -->
+    <div class="shot">
+      <div class="phone">
+        <div class="appbar">訂單查詢</div>
+        <div class="pbody">
+          <div class="m-box" style="margin-top:0;">
+            <div class="row"><span class="k">訂單編號</span><span class="v hi">F202605300001</span></div>
+            <div class="row"><span class="k">物流單號</span><span class="v">SF1234567</span></div>
+          </div>
+          <div class="m-tl">
+            <div class="tli done"><div class="col"><div class="d"></div><div class="ln"></div></div><div class="lbl2"><b>已回報付款</b><small>05/30 15:32</small></div></div>
+            <div class="tli done"><div class="col"><div class="d"></div><div class="ln"></div></div><div class="lbl2"><b>已確認收款</b><small>05/30 16:10</small></div></div>
+            <div class="tli now"><div class="col"><div class="d"></div></div><div class="lbl2"><b>已出貨</b><small>05/31 09:00 · 順豐</small></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">⑤ 訂單查詢結果<span>手機 + 查詢碼查進度</span></div>
+    </div>
+
+  </div>
+
+  <!-- 後台 -->
+  <p class="sub" style="margin:34px 0 0;">管理者後台（電腦版）— 收到通知後在此核帳與出貨：</p>
+  <div class="browser">
+    <div class="chrome">
+      <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+      <div class="url">your-domain.com/admin/orders</div>
+    </div>
+    <div class="win">
+      <div class="wt"><span class="pin">後台</span>訂單列表</div>
+      <table class="m">
+        <thead>
+          <tr><th>訂單編號</th><th>客戶</th><th>金額</th><th>末五碼</th><th>狀態</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">F202605300001</td><td>王小明</td><td>$1,280</td><td class="mono">12345</td>
+            <td><span class="badge b-reported">已回報付款</span></td>
+            <td><span class="act primary">確認收款</span><span class="act ghost">取消</span></td>
+          </tr>
+          <tr>
+            <td class="mono">F202605300002</td><td>陳美麗</td><td>$960</td><td class="mono">88210</td>
+            <td><span class="badge b-warn">付款異常</span></td>
+            <td><span class="act primary">確認收款</span><span class="act ghost">取消</span></td>
+          </tr>
+          <tr>
+            <td class="mono">F202605300003</td><td>林大同</td><td>$2,150</td><td class="mono">—</td>
+            <td><span class="badge b-wait">待付款</span></td>
+            <td><span class="act ghost">取消</span></td>
+          </tr>
+          <tr>
+            <td class="mono">F202605290088</td><td>張雅婷</td><td>$1,280</td><td class="mono">54021</td>
+            <td><span class="badge b-ok">已出貨</span></td>
+            <td><span class="act ghost">查看</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- 狀態機 -->
-  <h2>訂單狀態流程</h2>
-  <p style="color:var(--muted);font-size:14px;margin-top:0;">正常流程：</p>
+  <h2><span class="num">3</span>訂單狀態流程</h2>
+  <p class="sub">訂單在不同階段會處於以下狀態，含正常與異常兩種路徑。</p>
+  <p style="color:var(--ink-soft);font-size:14px;margin:0 0 10px;font-weight:700;">✅ 正常流程</p>
   <div class="states">
-    <span class="pill s-wait" style="background:#fff4e6;color:#d9480f;">待付款</span>
+    <span class="pill start">待付款</span>
     <span class="sep">→</span>
     <span class="pill">已回報付款</span>
     <span class="sep">→</span>
@@ -191,43 +510,46 @@
     <span class="sep">→</span>
     <span class="pill">備貨中</span>
     <span class="sep">→</span>
-    <span class="pill">已出貨</span>
+    <span class="pill end">已出貨</span>
   </div>
-  <p style="color:var(--muted);font-size:14px;margin-bottom:8px;">異常流程：</p>
-  <div class="states">
-    <span class="pill">待付款</span><span class="sep">→</span><span class="pill warn">已取消</span>
-    <span style="width:24px;"></span>
-    <span class="pill">已回報付款</span><span class="sep">→</span><span class="pill warn">付款異常</span>
-    <span style="width:24px;"></span>
-    <span class="pill warn">付款異常</span><span class="sep">→</span><span class="pill">已確認收款 / 已取消</span>
+  <p style="color:var(--ink-soft);font-size:14px;margin:22px 0 10px;font-weight:700;">⚠️ 異常 / 分支流程</p>
+  <div class="branch">
+    <div class="bx"><span class="pill start">待付款</span><span class="sep">→</span><span class="pill warn">已取消</span></div>
+    <div class="bx"><span class="pill">已回報付款</span><span class="sep">→</span><span class="pill warn">付款異常</span></div>
+    <div class="bx"><span class="pill warn">付款異常</span><span class="sep">→</span><span class="pill end">已確認收款</span><span class="sep">/</span><span class="pill warn">已取消</span></div>
   </div>
 
   <!-- 付款回報兩種入口 -->
-  <h2>付款回報的兩種入口</h2>
+  <h2><span class="num">4</span>付款回報的兩種入口</h2>
+  <p class="sub">顧客完成轉帳後，可透過兩種方式回到網站回報付款。</p>
   <div class="cards">
-    <div class="ccard">
-      <h3>方式一：訂單完成頁「我已付款」</h3>
+    <div class="ccard entry">
+      <span class="way">方式一</span>
+      <h3>訂單完成頁「我已付款」</h3>
       <ul>
-        <li>下單成功後直接顯示連結</li>
-        <li>連結可帶入訂單資訊</li>
-        <li><code>/payment-report?orderNo=...&code=...</code></li>
+        <li>下單成功後完成頁直接顯示連結</li>
+        <li>連結可帶入訂單資訊，免再輸入</li>
+        <li><code>/payment-report?orderNo=…&amp;code=…</code></li>
       </ul>
     </div>
-    <div class="ccard">
-      <h3>方式二：手機號碼 + 查詢碼</h3>
+    <div class="ccard entry">
+      <span class="way">方式二</span>
+      <h3>手機號碼 + 查詢碼</h3>
       <ul>
         <li>適用已離開完成頁的情況</li>
         <li>從「訂單查詢 / 我已付款」進入</li>
-        <li>查到訂單後再點「我已付款」</li>
+        <li>查到訂單後再點「我已付款」回報</li>
       </ul>
     </div>
   </div>
 
   <!-- 通知範例 -->
-  <h2>付款回報通知範例</h2>
-  <div class="example">💰 有新的付款回報
-
-訂單編號：F202605300001
+  <h2><span class="num">5</span>付款回報通知範例</h2>
+  <p class="sub">顧客送出回報後，管理者會立即收到 Telegram（或 Email）通知。</p>
+  <div class="notes">
+    <div class="note">
+      <div class="nh">💰 一般付款回報</div>
+      <div class="nb">訂單編號：F202605300001
 客戶姓名：王小明
 手機號碼：0912***789
 
@@ -237,11 +559,25 @@
 轉帳時間：2026-05-30 15:32
 
 目前狀態：已回報付款，待核帳
+後台查看：/admin/orders/F202605300001</div>
+    </div>
+    <div class="note alert">
+      <div class="nh">⚠️ 付款金額異常</div>
+      <div class="nb">訂單編號：F202605300002
+客戶姓名：陳美麗
 
-後台查看：https://your-domain.com/admin/orders/F202605300001</div>
+訂單金額：$960
+<span class="em">回報金額：$900</span>
+<span class="em">差額：-$60</span>
+
+請於後台人工核對後決定
+「確認收款」或「取消訂單」。</div>
+    </div>
+  </div>
 
   <!-- MVP 範圍 -->
-  <h2>第一版功能範圍（MVP）</h2>
+  <h2><span class="num">6</span>第一版功能範圍（MVP）</h2>
+  <p class="sub">第一版聚焦完成核心下單閉環，黑名單等進階防濫用列為第二階段。</p>
   <div class="cards">
     <div class="ccard">
       <h3>🖥️ 前台</h3>
@@ -277,7 +613,7 @@
         <li>同 IP 下單限制</li>
         <li>同手機未付款訂單限制</li>
         <li>同訂單回報次數限制</li>
-        <li>黑名單（第二階段）</li>
+        <li>黑名單 <span class="opt">（第二階段）</span></li>
       </ul>
     </div>
   </div>
@@ -285,7 +621,7 @@
 </div>
 
 <footer>
-  FreshMart 簡易下單系統 · 流程說明 v0.1 · 2026-05-30 ·
+  FreshMart 簡易下單系統 · 流程說明 v0.2 · 2026-05-30 ·
   詳細需求請見 <code>docs/order-system-spec.md</code>
 </footer>
 
