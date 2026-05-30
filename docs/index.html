@@ -13,8 +13,8 @@
     --red: #ff2d2d;
     --red-deep: #e11414;
     --red-ink: #c81818;
-    --orange: #ff6a3d;
-    --orange-deep: #d6330c;
+    --orange: #13b6a3;
+    --orange-deep: #0c7a6e;
     --bg: #f8fafc;
     --card: #ffffff;
     --ink: #0f172a;
@@ -77,15 +77,16 @@
   /* 黏土按鈕（CTA 橘） */
   .btn {
     font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 16px; color: #fff;
-    background: linear-gradient(180deg, #ff7a45 0%, #e23a12 100%);
+    background: linear-gradient(180deg, #15bba7 0%, #0e8074 100%);
+    text-shadow: 0 1px 2px rgba(3,54,48,.4);
     border: none; border-radius: 16px; padding: 13px 22px; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 9px 18px rgba(226,58,18,.34), inset 0 2px 3px rgba(255,255,255,.45), inset 0 -5px 9px rgba(150,40,8,.4);
+    box-shadow: 0 9px 18px rgba(13,148,136,.34), inset 0 2px 3px rgba(255,255,255,.45), inset 0 -5px 9px rgba(6,82,74,.4);
     transition: transform .18s var(--ease), box-shadow .18s var(--ease);
   }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 15px 26px rgba(226,58,18,.42), inset 0 2px 3px rgba(255,255,255,.45), inset 0 -5px 9px rgba(150,40,8,.4); }
-  .btn:active { transform: translateY(1px); box-shadow: 0 4px 9px rgba(226,58,18,.3), inset 0 3px 7px rgba(150,40,8,.5); }
-  .btn:focus-visible { outline: 3px solid #ffb38f; outline-offset: 2px; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 15px 26px rgba(13,148,136,.42), inset 0 2px 3px rgba(255,255,255,.45), inset 0 -5px 9px rgba(6,82,74,.4); }
+  .btn:active { transform: translateY(1px); box-shadow: 0 4px 9px rgba(13,148,136,.3), inset 0 3px 7px rgba(6,82,74,.5); }
+  .btn:focus-visible { outline: 3px solid #86e6d8; outline-offset: 2px; }
   .btn.ghost { background: #fff; color: var(--orange-deep); box-shadow: var(--clay); }
   .btn.ghost:hover { box-shadow: var(--clay-hi); }
   .btn.red { background: linear-gradient(180deg, #ff5a4d 0%, #d11414 100%); box-shadow: 0 9px 18px rgba(209,20,20,.32), inset 0 2px 3px rgba(255,255,255,.4), inset 0 -5px 9px rgba(150,8,8,.4); }
@@ -170,19 +171,26 @@
 
   .phone {
     width: 100%; max-width: 262px; border-radius: 40px; overflow: hidden; position: relative; background: #fff;
-    display: flex; flex-direction: column; min-height: 478px;
+    display: flex; flex-direction: column; min-height: 504px;
     box-shadow: 0 30px 60px rgba(15,23,42,.18), 0 0 0 8px #fff, 0 0 0 10px #ffe1dd;
     transition: transform .3s var(--ease), box-shadow .3s var(--ease);
   }
   .phone:hover { transform: translateY(-8px); box-shadow: 0 42px 80px rgba(15,23,42,.24), 0 0 0 8px #fff, 0 0 0 10px #ffd0c9; }
-  .phone .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 82px; height: 22px; background: #1c1e25; border-radius: 999px; z-index: 5; }
-  .pbar { position: relative; padding: 28px 18px 16px; color: #fff; background: linear-gradient(165deg, #ff5a4d 0%, #d11414 100%); }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 50px; height: 15px; background: rgba(0,0,0,.5); border-radius: 999px; z-index: 3; }
+  .statusbar { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; height: 16px; margin-bottom: 9px; }
+  .statusbar .time { font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 12px; }
+  .statusbar .si { display: flex; align-items: center; gap: 5px; }
+  .statusbar .si .icon { font-size: 14px; }
+  .pbar { position: relative; padding: 11px 16px 15px; color: #fff; background: linear-gradient(165deg, #ff5a4d 0%, #d11414 100%); }
   .pbar::after { content: ""; position: absolute; right: -28px; top: -36px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.3), transparent 70%); pointer-events: none; }
   .pbar .ptitle { position: relative; z-index: 1; display: flex; align-items: center; gap: 9px; font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 15px; }
   .pbar .ptitle .back { font-size: 19px; }
   .pbar .ptitle .icon { font-size: 18px; }
   .psearch { position: relative; z-index: 1; margin-top: 13px; background: rgba(255,255,255,.25); border-radius: 14px; padding: 9px 13px; display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: rgba(255,255,255,.95); box-shadow: inset 0 2px 5px rgba(120,0,0,.18); }
-  .pbody { padding: 16px; font-size: 12.5px; background: var(--bg); flex: 1 1 auto; }
+  .pbody { padding: 16px; font-size: 12.5px; background: var(--bg); flex: 1 1 auto; display: flex; flex-direction: column; }
+  .pfoot { margin-top: auto; padding-top: 14px; }
+  .phome { background: var(--bg); display: flex; justify-content: center; align-items: center; padding: 8px 0 10px; }
+  .phome span { width: 116px; height: 5px; border-radius: 999px; background: #d2d8e0; }
 
   .chips { display: flex; gap: 8px; overflow: hidden; margin-bottom: 14px; }
   .chips .c { font-size: 11.5px; font-weight: 800; padding: 6px 13px; border-radius: 999px; background: #fff; color: var(--muted); white-space: nowrap; box-shadow: var(--clay); }
@@ -200,7 +208,7 @@
   .pcard .rate span { color: var(--muted); }
   .pcard .prow { display: flex; align-items: center; justify-content: space-between; }
   .pcard .pp { font-family: "Fredoka",sans-serif; color: var(--red-ink); font-weight: 700; font-size: 14px; }
-  .pcard .add { width: 28px; height: 28px; border-radius: 10px; background: linear-gradient(180deg,#ff7a45,#e23a12); color: #fff; display: grid; place-items: center; box-shadow: 0 5px 11px rgba(226,58,18,.4); }
+  .pcard .add { width: 28px; height: 28px; border-radius: 10px; background: linear-gradient(180deg,#15bba7,#0e8074); color: #fff; display: grid; place-items: center; box-shadow: 0 5px 11px rgba(13,148,136,.4); }
   .pcard .add .icon { font-size: 15px; }
 
   .fab-cart { margin-top: 14px; background: linear-gradient(180deg,#ff5a4d,#d11414); color: #fff; border-radius: 16px; padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 9px 18px rgba(209,20,20,.32); font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 13px; }
@@ -214,7 +222,9 @@
   .ifield .ph { font-size: 12.5px; color: #aab4c2; margin-top: 2px; font-weight: 700; }
   .ifield.focus { box-shadow: 0 0 0 3px #ffd0c9, inset 0 2px 5px rgba(15,23,42,.06); }
 
-  .mbtn { background: linear-gradient(180deg,#ff7a45,#e23a12); color: #fff; text-align: center; padding: 13px; border-radius: 15px; font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 13.5px; box-shadow: 0 8px 16px rgba(226,58,18,.36), inset 0 2px 3px rgba(255,255,255,.4), inset 0 -4px 8px rgba(150,40,8,.35); margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .mbtn { background: linear-gradient(180deg,#15bba7,#0e8074); color: #fff; text-shadow: 0 1px 2px rgba(3,54,48,.4); text-align: center; padding: 13px; border-radius: 15px; font-family: "Fredoka",sans-serif; font-weight: 600; font-size: 13.5px; box-shadow: 0 8px 16px rgba(13,148,136,.36), inset 0 2px 3px rgba(255,255,255,.4), inset 0 -4px 8px rgba(6,82,74,.35); margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .18s var(--ease), box-shadow .18s var(--ease); }
+  .mbtn:hover { transform: translateY(-2px); box-shadow: 0 13px 22px rgba(13,148,136,.44), inset 0 2px 3px rgba(255,255,255,.4), inset 0 -4px 8px rgba(6,82,74,.35); }
+  .mbtn:active { transform: translateY(1px); }
   .mbtn.ghost { background: #fff; color: var(--orange-deep); box-shadow: var(--clay); margin-top: 10px; }
   .mbtn .icon { font-size: 16px; }
 
@@ -284,8 +294,8 @@
   .tg-ok { background: var(--c-green-bg); color: var(--c-green); }
   .tg-warn { background: var(--c-red-bg); color: var(--c-red); }
   .abtn { display: inline-flex; align-items: center; gap: 5px; font-family: "Fredoka",sans-serif; font-size: 11.5px; font-weight: 600; padding: 7px 13px; border-radius: 11px; margin-right: 6px; cursor: pointer; transition: transform .15s var(--ease), box-shadow .15s var(--ease); }
-  .abtn.primary { background: linear-gradient(180deg,#ff7a45,#e23a12); color: #fff; box-shadow: 0 5px 11px rgba(226,58,18,.34); }
-  .abtn.primary:hover { transform: translateY(-2px); box-shadow: 0 9px 16px rgba(226,58,18,.42); }
+  .abtn.primary { background: linear-gradient(180deg,#15bba7,#0e8074); color: #fff; box-shadow: 0 5px 11px rgba(13,148,136,.34); }
+  .abtn.primary:hover { transform: translateY(-2px); box-shadow: 0 9px 16px rgba(13,148,136,.42); }
   .abtn.ghost { background: var(--bg); color: var(--muted); }
   .abtn.ghost:hover { background: #fff; box-shadow: var(--clay); }
 
@@ -378,6 +388,9 @@
     <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
     <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></symbol>
     <symbol id="i-cherry" viewBox="0 0 24 24"><path d="M2 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3z"/><path d="M12 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3z"/><path d="M7 14c3.22-2.91 4.29-8.75 5-12 1.66 2.38 4.94 9 5 12"/><path d="M22 9c-4.29 0-7.14-2.33-10-7 5.71 0 10 4.67 10 7z"/></symbol>
+    <symbol id="i-signal" viewBox="0 0 24 24"><rect x="2" y="13.5" width="3.2" height="6.5" rx="1"/><rect x="7.6" y="9.5" width="3.2" height="10.5" rx="1"/><rect x="13.2" y="5.5" width="3.2" height="14.5" rx="1"/><rect x="18.8" y="2" width="3.2" height="18" rx="1"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16.2a6 6 0 0 1 7 0"/><path d="M12 20h.01"/></symbol>
+    <symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7.5" width="17" height="9" rx="2.5"/><path d="M22 11v2"/><rect x="4" y="9.5" width="11" height="5" rx="1" fill="currentColor" stroke="none"/></symbol>
   </defs>
 </svg>
 
@@ -509,8 +522,9 @@
       <!-- 1 商城 -->
       <div class="shot">
         <div class="phone">
-          <div class="notch"></div>
           <div class="pbar">
+            <div class="island"></div>
+            <div class="statusbar"><span class="time">9:41</span><span class="si"><svg class="icon fill"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery"/></svg></span></div>
             <div class="ptitle"><svg class="icon"><use href="#i-store"/></svg>FreshMart 生鮮</div>
             <div class="psearch"><svg class="icon" style="font-size:14px"><use href="#i-search"/></svg>搜尋想買的商品…</div>
           </div>
@@ -520,8 +534,9 @@
               <div class="pcard"><div class="pimg g1"><svg class="icon"><use href="#i-leaf"/></svg></div><div class="pmeta"><div class="pn">有機蔬菜箱</div><div class="rate"><svg class="icon fill"><use href="#i-star"/></svg>4.9 <span>(126)</span></div><div class="prow"><span class="pp">$680</span><span class="add"><svg class="icon"><use href="#i-cart"/></svg></span></div></div></div>
               <div class="pcard"><div class="pimg g3"><svg class="icon"><use href="#i-cherry"/></svg></div><div class="pmeta"><div class="pn">當季水果組</div><div class="rate"><svg class="icon fill"><use href="#i-star"/></svg>4.8 <span>(88)</span></div><div class="prow"><span class="pp">$600</span><span class="add"><svg class="icon"><use href="#i-cart"/></svg></span></div></div></div>
             </div>
-            <div class="fab-cart"><span class="l"><svg class="icon"><use href="#i-cart"/></svg>購物車 · 2 件</span><span>$1,280 ›</span></div>
+            <div class="pfoot"><div class="fab-cart"><span class="l"><svg class="icon"><use href="#i-cart"/></svg>購物車 · 2 件</span><span>$1,280 ›</span></div></div>
           </div>
+          <div class="phome"><span></span></div>
         </div>
         <div class="cap"><b>① 商城 / 購物車</b><span>挑選商品加入購物車</span></div>
       </div>
@@ -529,15 +544,19 @@
       <!-- 2 結帳 -->
       <div class="shot">
         <div class="phone">
-          <div class="notch"></div>
-          <div class="pbar"><div class="ptitle"><span class="back">‹</span>填寫訂購資料</div></div>
+          <div class="pbar">
+            <div class="island"></div>
+            <div class="statusbar"><span class="time">9:41</span><span class="si"><svg class="icon fill"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery"/></svg></span></div>
+            <div class="ptitle"><span class="back">‹</span>填寫訂購資料</div>
+          </div>
           <div class="pbody">
             <div class="ifield focus"><span class="lbl">姓名 <span class="req">*</span></span><div class="val">王小明</div></div>
             <div class="ifield"><span class="lbl">手機號碼 <span class="req">*</span></span><div class="val">0912-345-789</div></div>
             <div class="ifield"><span class="lbl">收件地址 <span class="req">*</span></span><div class="val">台北市信義區…</div></div>
             <div class="ifield"><span class="lbl">LINE ID（選填）</span><div class="ph">未填寫</div></div>
-            <div class="mbtn"><svg class="icon"><use href="#i-check"/></svg>送出訂單</div>
+            <div class="pfoot"><div class="mbtn"><svg class="icon"><use href="#i-check"/></svg>送出訂單</div></div>
           </div>
+          <div class="phome"><span></span></div>
         </div>
         <div class="cap"><b>② 結帳填寫</b><span>填基本訂購資料</span></div>
       </div>
@@ -545,8 +564,11 @@
       <!-- 3 訂單完成 -->
       <div class="shot">
         <div class="phone">
-          <div class="notch"></div>
-          <div class="pbar"><div class="ptitle">訂單完成</div></div>
+          <div class="pbar">
+            <div class="island"></div>
+            <div class="statusbar"><span class="time">9:41</span><span class="si"><svg class="icon fill"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery"/></svg></span></div>
+            <div class="ptitle">訂單完成</div>
+          </div>
           <div class="pbody">
             <div class="succ"><div class="ck"><svg class="icon"><use href="#i-check"/></svg></div><div class="st">訂單建立成功！</div><div class="ss">請於 24 小時內完成轉帳</div></div>
             <div class="sumcard">
@@ -555,9 +577,12 @@
               <div class="srow"><span class="k">轉帳帳號</span><span class="v">XXX-XXXX-XXXX</span></div>
               <div class="srow total"><span class="k">應付金額</span><span class="v">$1,280</span></div>
             </div>
-            <div class="mbtn"><svg class="icon"><use href="#i-card"/></svg>我已付款</div>
-            <div class="mbtn ghost"><svg class="icon"><use href="#i-search"/></svg>稍後查詢訂單</div>
+            <div class="pfoot">
+              <div class="mbtn"><svg class="icon"><use href="#i-card"/></svg>我已付款</div>
+              <div class="mbtn ghost"><svg class="icon"><use href="#i-search"/></svg>稍後查詢訂單</div>
+            </div>
           </div>
+          <div class="phome"><span></span></div>
         </div>
         <div class="cap"><b>③ 訂單完成頁</b><span>顯示查詢碼與轉帳資訊</span></div>
       </div>
@@ -565,15 +590,19 @@
       <!-- 4 付款回報 -->
       <div class="shot">
         <div class="phone">
-          <div class="notch"></div>
-          <div class="pbar"><div class="ptitle"><span class="back">‹</span>回報付款</div></div>
+          <div class="pbar">
+            <div class="island"></div>
+            <div class="statusbar"><span class="time">9:41</span><span class="si"><svg class="icon fill"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery"/></svg></span></div>
+            <div class="ptitle"><span class="back">‹</span>回報付款</div>
+          </div>
           <div class="pbody">
             <div class="ifield focus"><span class="lbl">轉帳末五碼 <span class="req">*</span></span><div class="val mono">12345</div></div>
             <div class="ifield"><span class="lbl">轉帳金額 <span class="req">*</span></span><div class="val">$1,280</div></div>
             <div class="ifield"><span class="lbl">轉帳時間 <span class="req">*</span></span><div class="val">2026/05/30 15:32</div></div>
             <div class="ifield"><span class="lbl">轉帳人姓名（選填）</span><div class="ph">未填寫</div></div>
-            <div class="mbtn"><svg class="icon"><use href="#i-clip"/></svg>送出回報</div>
+            <div class="pfoot"><div class="mbtn"><svg class="icon"><use href="#i-clip"/></svg>送出回報</div></div>
           </div>
+          <div class="phome"><span></span></div>
         </div>
         <div class="cap"><b>④ 我已付款（回報）</b><span>填轉帳末五碼回報</span></div>
       </div>
@@ -581,12 +610,15 @@
       <!-- 5 訂單查詢 -->
       <div class="shot">
         <div class="phone">
-          <div class="notch"></div>
-          <div class="pbar"><div class="ptitle"><svg class="icon"><use href="#i-search"/></svg>查詢我的訂單</div></div>
+          <div class="pbar">
+            <div class="island"></div>
+            <div class="statusbar"><span class="time">9:41</span><span class="si"><svg class="icon fill"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery"/></svg></span></div>
+            <div class="ptitle"><svg class="icon"><use href="#i-search"/></svg>查詢我的訂單</div>
+          </div>
           <div class="pbody">
             <div class="ifield focus"><span class="lbl">手機號碼 <span class="req">*</span></span><div class="val">0912-345-789</div></div>
             <div class="ifield"><span class="lbl">姓名 <span class="req">*</span></span><div class="val">王小明</div></div>
-            <div class="mbtn" style="margin-bottom:14px"><svg class="icon"><use href="#i-search"/></svg>查詢訂單</div>
+            <div class="mbtn" style="margin-bottom:16px"><svg class="icon"><use href="#i-search"/></svg>查詢訂單</div>
             <div class="listcap">名下相關訂單 · 共 2 筆</div>
             <div class="olist">
               <div class="orow">
@@ -601,6 +633,7 @@
               </div>
             </div>
           </div>
+          <div class="phome"><span></span></div>
         </div>
         <div class="cap"><b>⑤ 查詢我的訂單</b><span>手機 + 姓名查名下訂單</span></div>
       </div>
