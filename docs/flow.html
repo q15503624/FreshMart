@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreshMart 簡易下單系統 — 流程說明</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --card: #ffffff;
+    --ink: #1f2933;
+    --muted: #6b7280;
+    --line: #e2e8f0;
+    --brand: #2f9e44;
+    --brand-soft: #e6f4ea;
+    --user: #1c7ed6;
+    --user-soft: #e7f1fb;
+    --admin: #e8590c;
+    --admin-soft: #fdf0e6;
+    --sys: #7048e8;
+    --sys-soft: #efeafd;
+    --warn: #e03131;
+    --warn-soft: #fce8e8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Microsoft JhengHei", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, #2f9e44, #1c7ed6);
+    color: #fff;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 8px; font-size: 28px; }
+  header p { margin: 0; opacity: .92; max-width: 720px; margin-inline: auto; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  h2 {
+    font-size: 20px;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--line);
+  }
+
+  /* 角色圖例 */
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+  .legend .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 12px; border-radius: 999px; font-weight: 600; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .t-user { background: var(--user-soft); color: var(--user); }
+  .t-user .dot { background: var(--user); }
+  .t-sys { background: var(--sys-soft); color: var(--sys); }
+  .t-sys .dot { background: var(--sys); }
+  .t-admin { background: var(--admin-soft); color: var(--admin); }
+  .t-admin .dot { background: var(--admin); }
+
+  /* 流程步驟 */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 0 0 8px;
+  }
+  .step.user { border-left-color: var(--user); }
+  .step.sys { border-left-color: var(--sys); }
+  .step.admin { border-left-color: var(--admin); }
+  .step .role { font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+  .step.user .role { color: var(--user); }
+  .step.sys .role { color: var(--sys); }
+  .step.admin .role { color: var(--admin); }
+  .step .title { font-weight: 700; font-size: 16px; margin: 2px 0 4px; }
+  .step .desc { color: var(--muted); font-size: 14px; }
+  .arrow { text-align: center; color: var(--muted); font-size: 18px; margin: 2px 0 8px; }
+
+  /* 狀態徽章 */
+  .status { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 6px; margin-top: 8px; }
+  .s-wait { background: #fff4e6; color: #d9480f; }
+  .s-reported { background: var(--sys-soft); color: var(--sys); }
+  .s-confirmed { background: var(--brand-soft); color: var(--brand); }
+  .s-shipped { background: #e3fafc; color: #0c8599; }
+
+  /* 狀態機 */
+  .states { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .pill { font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); border-color: #f5c2c2; }
+  .sep { color: var(--muted); }
+
+  /* 卡片群 */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .ccard { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .ccard h3 { margin: 0 0 10px; font-size: 15px; }
+  .ccard ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+  .ccard li { margin: 3px 0; }
+
+  /* 範例 box */
+  .example { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 16px 18px; font-family: ui-monospace, "Consolas", monospace; font-size: 13px; white-space: pre-wrap; margin: 12px 0; }
+
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 24px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛒 FreshMart 簡易下單系統</h1>
+  <p>無會員、無金流，以「手機號碼 + 查詢碼 + 轉帳末五碼」完成訂單確認的下單網站。下單 → 轉帳回報 → 管理者核帳 → 出貨 → 查詢進度。</p>
+</header>
+
+<div class="wrap">
+
+  <div class="legend">
+    <span class="tag t-user"><span class="dot"></span>使用者操作</span>
+    <span class="tag t-sys"><span class="dot"></span>系統自動</span>
+    <span class="tag t-admin"><span class="dot"></span>管理者操作</span>
+  </div>
+
+  <!-- 主流程 -->
+  <h2>整體流程閉環</h2>
+  <div class="flow">
+
+    <div class="step user">
+      <div class="role">使用者</div>
+      <div class="title">1. 瀏覽商品並下單</div>
+      <div class="desc">瀏覽商品、加入購物車，結帳時填寫姓名、手機號碼、收件地址（LINE ID / 備註可選）。</div>
+    </div>
+    <div class="arrow">↓</div>
+
+    <div class="step sys">
+      <div class="role">系統</div>
+      <div class="title">2. 建立訂單，產生編號與查詢碼</div>
+      <div class="desc">產生訂單編號、查詢碼與付款資訊（金額、銀行、帳號）。</div>
+      <span class="status s-wait">待付款</span>
+    </div>
+    <div class="arrow">↓</div>
+
+    <div class="step user">
+      <div class="role">使用者</div>
+      <div class="title">3. 自行轉帳並回報付款</div>
+      <div class="desc">完成轉帳後，從「我已付款」連結或用「手機 + 查詢碼」進入回報頁，填寫轉帳末五碼、金額、時間。</div>
+      <span class="status s-reported">已回報付款</span>
+    </div>
+    <div class="arrow">↓</div>
+
+    <div class="step sys">
+      <div class="role">系統</div>
+      <div class="title">4. 即時通知管理者</div>
+      <div class="desc">透過 Telegram Bot 通知（Email 備援），含訂單與回報明細。金額不符會特別標示異常。</div>
+    </div>
+    <div class="arrow">↓</div>
+
+    <div class="step admin">
+      <div class="role">管理者</div>
+      <div class="title">5. 後台核帳</div>
+      <div class="desc">核對銀行入帳資料，可操作「確認收款」「付款異常」或「取消訂單」。</div>
+      <span class="status s-confirmed">已確認收款</span>
+    </div>
+    <div class="arrow">↓</div>
+
+    <div class="step admin">
+      <div class="role">管理者</div>
+      <div class="title">6. 備貨、出貨並更新狀態</div>
+      <div class="desc">出貨後在後台更新出貨狀態、出貨時間、物流方式（物流單號 / 備註可選）。</div>
+      <span class="status s-shipped">已出貨</span>
+    </div>
+    <div class="arrow">↓</div>
+
+    <div class="step user">
+      <div class="role">使用者</div>
+      <div class="title">7. 查詢訂單進度</div>
+      <div class="desc">用手機號碼 + 查詢碼查詢付款狀態、出貨狀態、物流資訊與更新時間。</div>
+    </div>
+
+  </div>
+
+  <!-- 狀態機 -->
+  <h2>訂單狀態流程</h2>
+  <p style="color:var(--muted);font-size:14px;margin-top:0;">正常流程：</p>
+  <div class="states">
+    <span class="pill s-wait" style="background:#fff4e6;color:#d9480f;">待付款</span>
+    <span class="sep">→</span>
+    <span class="pill">已回報付款</span>
+    <span class="sep">→</span>
+    <span class="pill">已確認收款</span>
+    <span class="sep">→</span>
+    <span class="pill">備貨中</span>
+    <span class="sep">→</span>
+    <span class="pill">已出貨</span>
+  </div>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:8px;">異常流程：</p>
+  <div class="states">
+    <span class="pill">待付款</span><span class="sep">→</span><span class="pill warn">已取消</span>
+    <span style="width:24px;"></span>
+    <span class="pill">已回報付款</span><span class="sep">→</span><span class="pill warn">付款異常</span>
+    <span style="width:24px;"></span>
+    <span class="pill warn">付款異常</span><span class="sep">→</span><span class="pill">已確認收款 / 已取消</span>
+  </div>
+
+  <!-- 付款回報兩種入口 -->
+  <h2>付款回報的兩種入口</h2>
+  <div class="cards">
+    <div class="ccard">
+      <h3>方式一：訂單完成頁「我已付款」</h3>
+      <ul>
+        <li>下單成功後直接顯示連結</li>
+        <li>連結可帶入訂單資訊</li>
+        <li><code>/payment-report?orderNo=...&code=...</code></li>
+      </ul>
+    </div>
+    <div class="ccard">
+      <h3>方式二：手機號碼 + 查詢碼</h3>
+      <ul>
+        <li>適用已離開完成頁的情況</li>
+        <li>從「訂單查詢 / 我已付款」進入</li>
+        <li>查到訂單後再點「我已付款」</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 通知範例 -->
+  <h2>付款回報通知範例</h2>
+  <div class="example">💰 有新的付款回報
+
+訂單編號：F202605300001
+客戶姓名：王小明
+手機號碼：0912***789
+
+訂單金額：$1,280
+回報金額：$1,280
+轉帳末五碼：12345
+轉帳時間：2026-05-30 15:32
+
+目前狀態：已回報付款，待核帳
+
+後台查看：https://your-domain.com/admin/orders/F202605300001</div>
+
+  <!-- MVP 範圍 -->
+  <h2>第一版功能範圍（MVP）</h2>
+  <div class="cards">
+    <div class="ccard">
+      <h3>🖥️ 前台</h3>
+      <ul>
+        <li>商品列表 / 詳情</li>
+        <li>購物車</li>
+        <li>建立訂單 / 訂單完成頁</li>
+        <li>我已付款頁</li>
+        <li>訂單查詢頁</li>
+      </ul>
+    </div>
+    <div class="ccard">
+      <h3>⚙️ 後台</h3>
+      <ul>
+        <li>商品管理</li>
+        <li>訂單列表 / 詳情</li>
+        <li>付款回報查看</li>
+        <li>確認收款 / 取消訂單</li>
+        <li>更新出貨狀態</li>
+      </ul>
+    </div>
+    <div class="ccard">
+      <h3>🔔 通知</h3>
+      <ul>
+        <li>Telegram 付款回報通知</li>
+        <li>Email 備援通知</li>
+      </ul>
+    </div>
+    <div class="ccard">
+      <h3>🛡️ 防濫用</h3>
+      <ul>
+        <li>Cloudflare Turnstile</li>
+        <li>同 IP 下單限制</li>
+        <li>同手機未付款訂單限制</li>
+        <li>同訂單回報次數限制</li>
+        <li>黑名單（第二階段）</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  FreshMart 簡易下單系統 · 流程說明 v0.1 · 2026-05-30 ·
+  詳細需求請見 <code>docs/order-system-spec.md</code>
+</footer>
+
+</body>
+</html>
