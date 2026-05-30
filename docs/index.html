@@ -195,16 +195,20 @@
   }
   .phone .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 78px; height: 20px; background: #1c1e25; border-radius: 999px; z-index: 5; }
   .pbar {
-    position: relative; padding: 26px 16px 14px;
-    background: var(--brand-grad); color: #fff;
+    position: relative; padding: 26px 16px 14px; color: #fff;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0) 58%),
+      linear-gradient(135deg, rgba(255,59,59,.92) 0%, rgba(224,16,16,.92) 100%);
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,.18);
   }
-  .pbar.glassbar {
-    background: linear-gradient(135deg, rgba(255,59,59,.95), rgba(224,16,16,.95));
+  .pbar::after {
+    content: ""; position: absolute; right: -30px; top: -40px; width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.28), transparent 70%); pointer-events: none;
   }
-  .pbar .ptitle { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; }
+  .pbar .ptitle { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; }
   .pbar .ptitle .back { font-size: 18px; opacity: .9; }
   .pbar .ptitle .icon { font-size: 17px; }
-  .psearch { margin-top: 12px; background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 7px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,.92); }
+  .psearch { position: relative; z-index: 1; margin-top: 12px; background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 7px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,.92); }
   .pbody { padding: 14px; font-size: 12px; background: #fbfbfc; }
 
   /* 分類膠囊 */
@@ -281,6 +285,15 @@
   .tl .ti .lab { padding-bottom: 12px; }
   .tl .ti .lab b { font-size: 12.5px; font-weight: 700; }
   .tl .ti .lab small { display: block; color: var(--muted); font-size: 11px; }
+
+  /* 名下訂單清單 */
+  .olist { display: flex; flex-direction: column; gap: 8px; }
+  .orow { display: flex; align-items: center; gap: 9px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 9px 11px; }
+  .orow .oinfo { flex: 1; min-width: 0; }
+  .orow .ono { font-family: ui-monospace, Consolas, monospace; font-size: 11px; font-weight: 700; }
+  .orow .oamt { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+  .orow .go { color: #c2c6cd; font-size: 14px; flex: none; }
+  .listcap { font-size: 10.5px; color: var(--muted); font-weight: 700; margin: 2px 0 8px; }
 
   /* ───── 後台桌面框 ───── */
   .browser { border-radius: var(--r-lg); overflow: hidden; margin-top: 12px; box-shadow: var(--sh); border: 1px solid var(--glass-line); background: #fff; }
@@ -436,7 +449,7 @@
     <div class="ov"><span class="step-no">01</span><div class="ring"><svg class="icon"><use href="#i-bag"/></svg></div><div class="h">顧客下單</div><div class="t">挑商品、填資料，取得訂單編號與查詢碼</div><div class="arr"><svg class="icon"><use href="#i-arrow"/></svg></div></div>
     <div class="ov"><span class="step-no">02</span><div class="ring"><svg class="icon"><use href="#i-card"/></svg></div><div class="h">轉帳回報</div><div class="t">自行轉帳後，回網站填寫末五碼回報</div><div class="arr"><svg class="icon"><use href="#i-arrow"/></svg></div></div>
     <div class="ov"><span class="step-no">03</span><div class="ring"><svg class="icon"><use href="#i-check"/></svg></div><div class="h">核帳出貨</div><div class="t">管理者收到通知、確認入帳後安排出貨</div><div class="arr"><svg class="icon"><use href="#i-arrow"/></svg></div></div>
-    <div class="ov"><span class="step-no">04</span><div class="ring"><svg class="icon"><use href="#i-search"/></svg></div><div class="h">查詢進度</div><div class="t">顧客用手機 + 查詢碼查看付款與物流</div></div>
+    <div class="ov"><span class="step-no">04</span><div class="ring"><svg class="icon"><use href="#i-search"/></svg></div><div class="h">查詢進度</div><div class="t">顧客用手機 + 姓名查看名下所有訂單</div></div>
   </div>
 
   <div class="legend">
@@ -474,7 +487,7 @@
       <div class="body">
         <div class="rolerow"><span class="role">顧客</span><span class="nidx">STEP 3</span></div>
         <div class="title">自行轉帳並回報付款</div>
-        <div class="desc">完成轉帳後，從「我已付款」連結，或用「手機 + 查詢碼」進入回報頁，填寫轉帳末五碼、金額、時間。</div>
+        <div class="desc">完成轉帳後，從「我已付款」連結，或用「手機 + 姓名」查到訂單後進入回報頁，填寫轉帳末五碼、金額、時間。</div>
         <span class="status s-reported"><svg class="icon"><use href="#i-clip"/></svg>狀態：已回報付款</span>
       </div>
     </div>
@@ -513,7 +526,7 @@
       <div class="body">
         <div class="rolerow"><span class="role">顧客</span><span class="nidx">STEP 7</span></div>
         <div class="title">查詢訂單進度</div>
-        <div class="desc">用手機號碼 + 查詢碼查詢付款狀態、出貨狀態、物流資訊與更新時間。</div>
+        <div class="desc">用手機號碼 + 姓名查詢名下所有訂單的付款狀態、出貨狀態、物流資訊與更新時間。</div>
       </div>
     </div>
 
@@ -601,17 +614,27 @@
     <div class="shot">
       <div class="phone">
         <div class="notch"></div>
-        <div class="pbar"><div class="ptitle"><svg class="icon"><use href="#i-search"/></svg>訂單查詢</div></div>
+        <div class="pbar"><div class="ptitle"><svg class="icon"><use href="#i-search"/></svg>查詢我的訂單</div></div>
         <div class="pbody">
-          <div class="sumcard"><div class="srow"><span class="k">訂單編號</span><span class="v code">F202605300001</span></div><div class="srow"><span class="k">物流單號</span><span class="v">SF-1234567</span></div></div>
-          <div class="tl">
-            <div class="ti done"><div class="rail"><div class="pt"><svg class="icon"><use href="#i-check"/></svg></div><div class="line"></div></div><div class="lab"><b>已回報付款</b><small>05/30 15:32</small></div></div>
-            <div class="ti done"><div class="rail"><div class="pt"><svg class="icon"><use href="#i-check"/></svg></div><div class="line"></div></div><div class="lab"><b>已確認收款</b><small>05/30 16:10</small></div></div>
-            <div class="ti now"><div class="rail"><div class="pt"><svg class="icon"><use href="#i-truck"/></svg></div></div><div class="lab"><b>已出貨 · 順豐</b><small>05/31 09:00 配送中</small></div></div>
+          <div class="ifield focus"><span class="lbl">手機號碼 <span class="req">*</span></span><div class="val">0912-345-789</div></div>
+          <div class="ifield"><span class="lbl">姓名 <span class="req">*</span></span><div class="val">王小明</div></div>
+          <div class="cta" style="margin-bottom:13px"><svg class="icon"><use href="#i-search"/></svg>查詢訂單</div>
+          <div class="listcap">名下相關訂單 · 共 2 筆</div>
+          <div class="olist">
+            <div class="orow">
+              <div class="oinfo"><div class="ono">F202605300001</div><div class="oamt">$1,280 · 05/30</div></div>
+              <span class="tg tg-ok"><svg class="icon"><use href="#i-truck"/></svg>已出貨</span>
+              <svg class="icon go"><use href="#i-chev"/></svg>
+            </div>
+            <div class="orow">
+              <div class="oinfo"><div class="ono">F202605280042</div><div class="oamt">$640 · 05/28</div></div>
+              <span class="tg tg-wait"><svg class="icon"><use href="#i-clock"/></svg>待付款</span>
+              <svg class="icon go"><use href="#i-chev"/></svg>
+            </div>
           </div>
         </div>
       </div>
-      <div class="cap"><b>⑤ 訂單查詢結果</b><span>手機 + 查詢碼查進度</span></div>
+      <div class="cap"><b>⑤ 查詢我的訂單</b><span>手機 + 姓名查名下訂單</span></div>
     </div>
 
   </div>
@@ -712,11 +735,11 @@
     <div class="ccard glass entry">
       <span class="way">方式二</span>
       <div class="ic-top"><svg class="icon"><use href="#i-search"/></svg></div>
-      <h3>手機號碼 + 查詢碼</h3>
+      <h3>手機號碼 + 姓名</h3>
       <ul>
-        <li><svg class="icon"><use href="#i-check"/></svg>適用已離開完成頁的情況</li>
-        <li><svg class="icon"><use href="#i-check"/></svg>從「訂單查詢 / 我已付款」進入</li>
-        <li><svg class="icon"><use href="#i-check"/></svg>查到訂單後再點「我已付款」回報</li>
+        <li><svg class="icon"><use href="#i-check"/></svg>適用已離開完成頁的情況（不需查詢碼）</li>
+        <li><svg class="icon"><use href="#i-check"/></svg>從「訂單查詢」列出名下所有訂單</li>
+        <li><svg class="icon"><use href="#i-check"/></svg>選擇訂單後再點「我已付款」回報</li>
       </ul>
     </div>
   </div>
